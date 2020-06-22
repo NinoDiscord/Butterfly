@@ -3,7 +3,7 @@ package dev.augu.nino.butterfly.command
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Message
 
-class CommandHandler(val client: ButterflyClient) {
+class CommandHandler(private val client: ButterflyClient) {
     suspend fun invoke(message: Message) {
         var content = message.contentRaw
 
@@ -20,7 +20,10 @@ class CommandHandler(val client: ButterflyClient) {
         }
 
         if (message.isFromGuild &&
-            !message.member!!.hasPermission(message.textChannel, Permission.getPermissions(command.userPermissions))
+            !message.member!!.hasPermission(
+                message.textChannel,
+                Permission.getPermissions(command.userPermissions)
+            )
         ) {
             throw CommandException(
                 InsufficientUserPermissionsError(

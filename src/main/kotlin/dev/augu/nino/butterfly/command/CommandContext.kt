@@ -23,7 +23,7 @@ class CommandContext(
     val channel: MessageChannel = message.channel
     val jda: JDA = message.jda
     val me: SelfUser = jda.selfUser
-    val meMember: Member? = message.guild.memberCache.getElementById(me.id)
+    val meMember: Member? = message.guild.selfMember
 
     /**
      * Replies to the message

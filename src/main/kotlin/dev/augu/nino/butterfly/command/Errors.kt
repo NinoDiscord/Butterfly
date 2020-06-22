@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.entities.Message
 data class NotInGuildError(
     override val message: Message,
     override val command: Command
-) : CommandError(message, command, "Guild-only command invoked in ")
+) : CommandError(message, command, "Guild-only command invoked in non-guild environment.")
 
 data class InsufficientUserPermissionsError(
     override val message: Message,
