@@ -5,7 +5,7 @@ import dev.augu.nino.butterfly.command.CommandHandler
 import io.kotest.assertions.throwables.shouldThrowMessage
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
-import io.mockk.clearMocks
+import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.CoroutineScope
@@ -38,7 +38,7 @@ class CommandHandlerTests : DescribeSpec({
     })
 
     beforeTest {
-        clearMocks(message)
+        clearAllMocks()
     }
 
     describe("Command Handler invoke tests") {
@@ -68,9 +68,10 @@ class CommandHandlerTests : DescribeSpec({
             every { message.textChannel } returns guildChannel
             every { message.contentRaw } returns "x!test"
             every { member.permissions } returns Permission.getPermissions(0)
-            every { member.hasPermission(guildChannel, *anyVararg()) } returns false
+            every { member.hasPermission(any(), any<Collection<Permission>>()) } returns false
 
-            message.member!!.hasPermission(guildChannel, Permission.MESSAGE_WRITE).shouldBe(false)
+            message.member!!.hasPermission(guildChannel, Permission.getPermissions(Permission.MESSAGE_WRITE.rawValue))
+                .shouldBe(false)
 
             shouldThrowMessage("User has insufficient permissions.") {
                 runBlocking {
@@ -86,18 +87,18 @@ class CommandHandlerTests : DescribeSpec({
             val me = mockk<Member>(relaxed = true)
 
             every { message.isFromGuild } returns true
-            every { member.permissions } returns Permission.getPermissions(Permission.MESSAGE_WRITE.rawValue)
-            every { member.hasPermission(guildChannel, *anyVararg()) } returns true
-            every { me.hasPermission(guildChannel, *anyVararg()) } returns false
-            every { message.member } returns member
-            every { guild.selfMember } returns me
-            every { me.permissions } returns Permission.getPermissions(0)
-            every { message.guild } returns guild
             every { message.textChannel } returns guildChannel
+            every { member.permissions } returns Permission.getPermissions(Permission.MESSAGE_WRITE.rawValue)
+            every { member.hasPermission(any(), any<Collection<Permission>>()) } returns true
+            every { me.hasPermission(any(), any<Collection<Permission>>()) } returns false
+            every { message.member } returns member
+            every { me.permissions } returns Permission.getPermissions(0)
+            every { guild.selfMember } returns me
+            every { message.guild } returns guild
             every { message.contentRaw } returns "x!test"
 
-            message.member!!.hasPermission(guildChannel, Permission.MESSAGE_WRITE).shouldBe(true)
-            message.guild.selfMember.hasPermission(guildChannel, Permission.MESSAGE_WRITE).shouldBe(false)
+            message.member!!.hasPermission(message.textChannel, Permission.getPermissions(1)).shouldBe(true)
+            message.guild.selfMember.hasPermission(guildChannel, Permission.getPermissions(1)).shouldBe(false)
             shouldThrowMessage("Bot has insufficient permissions.") {
                 runBlocking {
                     handler.invoke(message)

@@ -25,7 +25,7 @@ class ButterflyClient(val jda: JDA, invokeOnMessageEdit: Boolean = false, val sc
                     errorHandler.invoke(c.error)
                 }
             } catch (e: Exception) {
-                println("CommandClient: Caught an error during execution of command: ${e.localizedMessage}")
+                println("CommandClient: Uncaught error during execution of command: ${e.localizedMessage}")
             }
         }
     }
