@@ -60,7 +60,8 @@ class CommandContext(
     }
 
     suspend fun reply(msg: CharSequence): Message {
-        return replyMono(msg).awaitSingle()
+        val msg = replyMono(msg).awaitSingle()
+        return msg
     }
 
     suspend fun reply(msg: Message): Message {
