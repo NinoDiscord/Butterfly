@@ -1,5 +1,6 @@
 package dev.augu.nino.butterfly.command
 
+import dev.augu.nino.butterfly.ButterflyClient
 import net.dv8tion.jda.api.entities.Message
 
 abstract class CommandError(open val message: Message, open val command: Command, open val reason: String?) {

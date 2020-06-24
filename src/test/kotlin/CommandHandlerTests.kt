@@ -1,5 +1,9 @@
 import club.minnced.jda.reactor.asMono
-import dev.augu.nino.butterfly.command.*
+import dev.augu.nino.butterfly.ButterflyClient
+import dev.augu.nino.butterfly.command.Command
+import dev.augu.nino.butterfly.command.CommandContext
+import dev.augu.nino.butterfly.command.CommandException
+import dev.augu.nino.butterfly.command.CommandHandler
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrowMessage
 import io.kotest.core.spec.style.DescribeSpec
@@ -139,7 +143,6 @@ class CommandHandlerTests : DescribeSpec({
                 }
             }
 
-            println("Handler Invoke Passed!")
             coVerify(exactly = 1) { command.execute(any()) }
 
             verify(exactly = 1) { message.channel.sendMessage("test") }
@@ -179,7 +182,6 @@ class CommandHandlerTests : DescribeSpec({
                 }
             }
 
-            println("Handler Invoke Passed!")
             coVerify(exactly = 1) { command.execute(match { it.args.contentEquals(arrayOf("a", "b", "c", "d")) }) }
 
             verify(exactly = 1) { message.channel.sendMessage("test") }

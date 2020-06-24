@@ -1,5 +1,6 @@
 package dev.augu.nino.butterfly.command
 
+import dev.augu.nino.butterfly.ButterflyClient
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Message
 
@@ -47,7 +48,7 @@ class CommandHandler(private val client: ButterflyClient) {
             )
         }
 
-        val ctx = CommandContext(message, command, content.split(" ").toTypedArray(), prefix)
+        val ctx = CommandContext(message, command, content.split(" ").toTypedArray(), prefix, client)
 
         command.execute(ctx)
     }

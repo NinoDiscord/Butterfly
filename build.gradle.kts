@@ -1,6 +1,7 @@
 plugins {
     java
     kotlin("jvm") version "1.3.72"
+    id("org.jetbrains.dokka") version "0.10.1"
 }
 
 group = "dev.augu.nino"
@@ -32,7 +33,7 @@ dependencies {
     testImplementation("io.mockk", "mockk", "1.10.0")
     testImplementation("org.jetbrains.kotlinx", "kotlinx-coroutines-test", "1.3.7")
 
-    // Login
+    // Logging
     api("org.slf4j", "slf4j-api", "1.6.1")
     testImplementation("org.slf4j", "slf4j-simple", "1.6.1")
 }
@@ -40,12 +41,17 @@ dependencies {
 configure<JavaPluginConvention> {
     sourceCompatibility = JavaVersion.VERSION_1_8
 }
+
 tasks {
     compileKotlin {
         kotlinOptions.jvmTarget = "1.8"
     }
     compileTestKotlin {
         kotlinOptions.jvmTarget = "1.8"
+    }
+    val dokka by getting(org.jetbrains.dokka.gradle.DokkaTask::class) {
+        outputFormat = "html"
+        outputDirectory = "$buildDir/dokka"
     }
 }
 
