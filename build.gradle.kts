@@ -59,7 +59,7 @@ tasks {
             includes = file("docs").listFiles()!!.map { it.canonicalPath }
             externalDocumentationLink {
                 url = URL("https://ci.dv8tion.net/job/JDA/javadoc/index.html")
-                packageListUrl = url
+                packageListUrl = URL("https://ci.dv8tion.net/job/JDA/javadoc/element-list")
             }
         }
     }
