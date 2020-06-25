@@ -25,6 +25,7 @@ jobs:
     - name: Create Documentation
       run: ./gradlew dokka
     - run: mv build/dokka/-butterfly build/dokka/butterfly
+    - run: cd build/dokka
     - name: Push to docs server
       uses: appleboy/scp-action@master
       with:
@@ -32,6 +33,6 @@ jobs:
         port: 22
         username: ${{ secrets.REMOTE_USER }}
         password: ${{ secrets.REMOTE_PASS }}
-        source: "build/dokka"
+        source: "."
         target: "~/kotlin-docs"
         override: true
