@@ -6,7 +6,8 @@ name: Kotlin CI with Gradle
 on:
   push:
     branches: [ master ]
-    paths-ignore: [ "*.yml" ]
+    paths-ignore: 
+    - '**.yml'
   pull_request:
     branches: [ master ]
 
