@@ -24,5 +24,12 @@ jobs:
       run: chmod +x gradlew
     - name: Create Documentation
       run: ./gradlew dokka
+    - run: mv build/dokka/-butterfly build/dokka/butterfly
     - name: Push to docs server
-      run: echo soon
+      uses: appleboy/scp-action@v0.0.1
+      with:
+        host: ${{ secrets.REMOTE_IP }}
+        username: ${{ secrets.REMOTE_USER }}
+        password: ${{ secrets.REMOTE_PASS }}
+        source: "build/dokka"
+        target: "~/kotlin-docs"
