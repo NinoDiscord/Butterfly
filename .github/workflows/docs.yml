@@ -35,3 +35,4 @@ jobs:
         source: "build/dokka/butterfly,build/dokka/style.css"
         target: "~/kotlin-docs"
         override: true
+        strip_components: 2
