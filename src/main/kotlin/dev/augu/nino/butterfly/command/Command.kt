@@ -7,32 +7,9 @@ import net.dv8tion.jda.api.Permission
  *
  * This class represents a command.
  *
- * ## Example:
- * ```
- * class TestCommand : Command(
- *   "test", "generic", "teest",
- *   guildOnly = true,
- *   userPermissions = Permission.getRaw(Permission.MESSAGE_WRITE),
- *   botPermissions = Permission.getRaw(Permission.MESSAGE_WRITE)
- *   ) {
- *
- *   override suspend fun execute(ctx: CommandContext) {
- *     ctx.reply("test")
- *   }
- * }
- * ```
- *
- * ## Ping Example:
- * ```
- * // The Ping example from JDA-Utilities, redone in Butterfly!
- * class PingCommand : Command("ping", "generic", "pong", guildOnly = true) {
- *   override suspend fun execute(ctx: CommandContext) {
- *      val msg = ctx.reply("Calculating...")
- *      val ping = ctx.message.timeCreated.until(msg.timeCreated, ChronoUnit.MILLIS)
- *      msg.edit("Ping: ${ping}ms | Websocket: ${ctx.client.gatewayPing}ms")
- *   }
- * }
- * ```
+ * ## Examples:
+ * @sample dev.augu.nino.butterfly.examples.EchoCommand
+ * @sample dev.augu.nino.butterfly.examples.PingCommand
  *
  * @property name the command name
  * @property category the category

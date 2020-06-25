@@ -44,8 +44,18 @@ configure<JavaPluginConvention> {
     sourceCompatibility = JavaVersion.VERSION_1_8
 }
 
-val demo by sourceSets.creating {
+sourceSets {
+    create("examples") {
+        compileClasspath += sourceSets.main.get().output
+        runtimeClasspath += sourceSets.main.get().output
+    }
 }
+
+val examplesImplementation by configurations.getting {
+    extendsFrom(configurations.implementation.get())
+}
+
+configurations["examplesRuntimeOnly"].extendsFrom(configurations.runtimeOnly.get())
 
 tasks {
     compileKotlin {
@@ -61,6 +71,8 @@ tasks {
             moduleName = "Butterfly"
             includes = file("docs").listFiles()!!.map { it.canonicalPath }
             externalDocumentationLink {
+                samples += file("src/examples/kotlin/dev/augu/nino/butterfly/examples").listFiles()!!
+                    .map { it.canonicalPath }
                 url = URL("https://ci.dv8tion.net/job/JDA/javadoc/index.html")
                 packageListUrl = URL("https://ci.dv8tion.net/job/JDA/javadoc/element-list")
             }

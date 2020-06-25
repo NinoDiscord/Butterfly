@@ -22,11 +22,7 @@ import org.slf4j.LoggerFactory
  * This class wraps the normal JDA client and allows access to all of Butterfly's subprojects at ease.
  *
  * ## Example:
- * ```
- * val client = ButterflyClient(jda)
- *
- * client.addCommand(command)
- * ```
+ * @sample dev.augu.nino.butterfly.examples.ExampleBot
  * @property jda the JDA instance
  * @property scope the scope on which to run the coroutines
  * @constructor creates a new ButterflyClient
@@ -59,7 +55,7 @@ class ButterflyClient(
     val prefixGetters: ArrayList<suspend (Message) -> String?> = ArrayList()
 
     /**
-     * A list of commandErrorHandlers
+     * A list of [CommandErrorHandler]s
      */
     val commandErrorHandlers: ArrayList<CommandErrorHandler> = ArrayList()
 

@@ -10,4 +10,4 @@ WIP
 WIP
 
 ### Examples
-You can see the [Examples](https://github.com/NinoDiscord/Butterfly/tree/master/examples) directory on GitHub.
+You can see the [Examples](https://github.com/NinoDiscord/Butterfly/tree/master/src/examples/kotlin/dev/augu/nino/butterfly/examples) directory on GitHub.
