@@ -34,15 +34,15 @@ jobs:
         username: ${{ secrets.REMOTE_USER }}
         password: ${{ secrets.REMOTE_PASS }}
         source: "build/dokka/butterfly,build/dokka/style.css"
-        target: "~/kotlin-docs"
+        target: "/var/www/docs.augu.dev/dist"
         override: true
         strip_components: 2
-    - name: Move from kotlin-docs to location
-      uses: appleboy/ssh-action@master
-      with:
-        # ssh host
-        host: ${{ secrets.REMOTE_IP }}
-        username: ${{ secrets.REMOTE_USER }}
-        password: ${{ secrets.REMOTE_PASS }}
-        script: |
-          cp ~/kotlin-docs/* /var/www/docs.augu.dev/dist
+#     - name: Move from kotlin-docs to location
+#       uses: appleboy/ssh-action@master
+#       with:
+#         # ssh host
+#         host: ${{ secrets.REMOTE_IP }}
+#         username: ${{ secrets.REMOTE_USER }}
+#         password: ${{ secrets.REMOTE_PASS }}
+#         script: |
+#           cp ~/kotlin-docs/* /var/www/docs.augu.dev/dist
