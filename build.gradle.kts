@@ -1,3 +1,5 @@
+import java.net.URL
+
 plugins {
     java
     kotlin("jvm") version "1.3.72"
@@ -49,12 +51,16 @@ tasks {
     compileTestKotlin {
         kotlinOptions.jvmTarget = "1.8"
     }
-    val dokka by getting(org.jetbrains.dokka.gradle.DokkaTask::class) {
+    dokka {
         outputFormat = "html"
         outputDirectory = "$buildDir/dokka"
         configuration {
             moduleName = "Butterfly"
             includes = file("docs").listFiles()!!.map { it.canonicalPath }
+            externalDocumentationLink {
+                url = URL("https://ci.dv8tion.net/job/JDA/javadoc/index.html")
+                packageListUrl = url
+            }
         }
     }
 }

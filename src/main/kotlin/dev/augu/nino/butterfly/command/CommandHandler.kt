@@ -58,7 +58,7 @@ class CommandHandler(private val client: ButterflyClient) {
             throw CommandException(
                 InsufficientBotPermissionsError(
                     message,
-                    command, command.botPermissions, Permission.getRaw(message.guild.selfMember!!.permissions)
+                    command, command.botPermissions, Permission.getRaw(message.guild.selfMember.permissions)
                 )
             )
         }

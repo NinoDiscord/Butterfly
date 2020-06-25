@@ -12,6 +12,8 @@ import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 
 /**
@@ -60,6 +62,12 @@ class ButterflyClient(
      * A list of commandErrorHandlers
      */
     val commandErrorHandlers: ArrayList<CommandErrorHandler> = ArrayList()
+
+    /**
+     * Logger
+     */
+    val logger: Logger = LoggerFactory.getLogger(this::class.java)
+
     private val handler: CommandHandler =
         CommandHandler(this)
 
@@ -75,10 +83,10 @@ class ButterflyClient(
                     errorHandler.invoke(c.error)
                 }
                 if (commandErrorHandlers.isEmpty()) {
-                    println("CommandClient: Uncaught error during execution of command: ${c.localizedMessage}")
+                    logger.error("CommandClient: Uncaught error during execution of command: ${c.localizedMessage}")
                 }
             } catch (e: Exception) { // Makes sure not to crash on any command error
-                println("CommandClient: Uncaught error during execution of command: ${e.localizedMessage}")
+                logger.error("CommandClient: Uncaught error during execution of command: ${e.localizedMessage}")
             }
         }
     }
@@ -115,7 +123,7 @@ class ButterflyClient(
     /**
      * Adds a prefix
      *
-     * @param the prefix to add
+     * @param prefix the prefix to add
      */
     fun addPrefix(prefix: String) {
         prefixes.add(prefix)
