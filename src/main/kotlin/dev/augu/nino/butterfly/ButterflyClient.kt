@@ -142,4 +142,11 @@ class ButterflyClient(
     fun addErrorHandler(handler: CommandErrorHandler) {
         commandErrorHandlers.add(handler)
     }
+
+    /**
+     * Connects the butterfly client with the JDA instance.
+     *
+     * @return the ButterflyClient instance
+     */
+    fun JDA.client(): ButterflyClient = this@ButterflyClient
 }

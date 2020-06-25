@@ -1,21 +1,20 @@
-import club.minnced.jda.reactor.asMono
+package command
+
 import dev.augu.nino.butterfly.ButterflyClient
 import dev.augu.nino.butterfly.command.Command
 import dev.augu.nino.butterfly.command.CommandContext
 import dev.augu.nino.butterfly.command.CommandException
 import dev.augu.nino.butterfly.command.CommandHandler
+import dev.augu.nino.butterfly.util.reply
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.assertions.throwables.shouldThrowMessage
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.reactive.awaitSingle
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.*
-import net.dv8tion.jda.api.requests.restaction.MessageAction
-import reactor.core.publisher.Mono
 
 @ExperimentalCoroutinesApi
 @ObsoleteCoroutinesApi
@@ -58,6 +57,33 @@ class CommandHandlerTests : DescribeSpec({
                     handler.invoke(message)
                 }
             }
+        }
+
+        it("should not run a command if the user is a bot") {
+            val guild = mockk<Guild>(relaxed = true)
+            val guildChannel = mockk<TextChannel>(relaxed = true)
+            val member = mockk<Member>(relaxed = true)
+
+            every { message.author.isBot } returns true
+            every { message.isFromGuild } returns true
+            every { message.guild } returns guild
+            every { message.member } returns member
+            every { message.textChannel } returns guildChannel
+            every { message.contentRaw } returns "x!test"
+            every { member.permissions } returns Permission.getPermissions(0)
+            every { member.hasPermission(any(), any<Collection<Permission>>()) } returns true
+
+            shouldNotThrow<Exception> {
+                runBlocking {
+                    handler.invoke(message)
+                }
+            }
+
+            coVerify(exactly = 0) {
+                command.execute(any())
+            }
+
+            confirmVerified(command)
         }
 
         it("should not run a command if the user doesn't have enough permissions") {
@@ -114,10 +140,10 @@ class CommandHandlerTests : DescribeSpec({
             val guildChannel = mockk<TextChannel>(relaxed = true)
             val member = mockk<Member>(relaxed = true)
             val me = mockk<Member>(relaxed = true)
-            val sampleAction = mockk<MessageAction>(relaxed = true)
             val sampleMsg = mockk<Message>(relaxed = true)
 
             every { message.isFromGuild } returns true
+            every { message.channel } returns guildChannel
             every { message.textChannel } returns guildChannel
             every { member.permissions } returns Permission.getPermissions(Permission.MESSAGE_WRITE.rawValue)
             every { member.hasPermission(any(), any<Collection<Permission>>()) } returns true
@@ -129,13 +155,8 @@ class CommandHandlerTests : DescribeSpec({
             every { message.guild } returns guild
             every { message.contentRaw } returns "x!test"
 
-            mockkStatic("club.minnced.jda.reactor.RestActions") // in order to mock the asMono extension function.
-            every { sampleAction.asMono() } returns Mono.just(sampleMsg)
-            every { message.channel.sendMessage(any<CharSequence>()) } returns sampleAction
-
-            runBlocking {
-                sampleAction.asMono().awaitSingle().shouldBe(sampleMsg)
-            }
+            mockkStatic("dev.augu.nino.butterfly.util.MessageExtensions") // in order to mock the reply extension function.
+            coEvery { message.reply(any<CharSequence>()) } returns sampleMsg
 
             shouldNotThrow<CommandException> {
                 runBlocking {
@@ -145,7 +166,7 @@ class CommandHandlerTests : DescribeSpec({
 
             coVerify(exactly = 1) { command.execute(any()) }
 
-            verify(exactly = 1) { message.channel.sendMessage("test") }
+            coVerify(exactly = 1) { message.reply("test") }
         }
 
         it("should run the command and send arguments") {
@@ -153,10 +174,10 @@ class CommandHandlerTests : DescribeSpec({
             val guildChannel = mockk<TextChannel>(relaxed = true)
             val member = mockk<Member>(relaxed = true)
             val me = mockk<Member>(relaxed = true)
-            val sampleAction = mockk<MessageAction>(relaxed = true)
             val sampleMsg = mockk<Message>(relaxed = true)
 
             every { message.isFromGuild } returns true
+            every { message.channel } returns guildChannel
             every { message.textChannel } returns guildChannel
             every { member.permissions } returns Permission.getPermissions(Permission.MESSAGE_WRITE.rawValue)
             every { member.hasPermission(any(), any<Collection<Permission>>()) } returns true
@@ -168,13 +189,8 @@ class CommandHandlerTests : DescribeSpec({
             every { message.guild } returns guild
             every { message.contentRaw } returns "x!test a b c d"
 
-            mockkStatic("club.minnced.jda.reactor.RestActions") // in order to mock the asMono extension function.
-            every { sampleAction.asMono() } returns Mono.just(sampleMsg)
-            every { message.channel.sendMessage(any<CharSequence>()) } returns sampleAction
-
-            runBlocking {
-                sampleAction.asMono().awaitSingle().shouldBe(sampleMsg)
-            }
+            mockkStatic("dev.augu.nino.butterfly.util.MessageExtensions") // in order to mock the reply extension function.
+            coEvery { message.reply(any<CharSequence>()) } returns sampleMsg
 
             shouldNotThrow<CommandException> {
                 runBlocking {
@@ -184,7 +200,7 @@ class CommandHandlerTests : DescribeSpec({
 
             coVerify(exactly = 1) { command.execute(match { it.args.contentEquals(arrayOf("a", "b", "c", "d")) }) }
 
-            verify(exactly = 1) { message.channel.sendMessage("test") }
+            coVerify(exactly = 1) { message.reply("test") }
         }
     }
 

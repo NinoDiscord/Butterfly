@@ -9,5 +9,5 @@ WIP
 ### Contributing
 WIP
 
-## Examples
+### Examples
 You can see the [Examples](https://github.com/NinoDiscord/Butterfly/tree/master/examples) directory on GitHub.

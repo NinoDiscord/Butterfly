@@ -1,15 +1,13 @@
 package dev.augu.nino.butterfly.command
 
 import club.minnced.jda.reactor.asMono
-import club.minnced.jda.reactor.on
 import dev.augu.nino.butterfly.ButterflyClient
+import dev.augu.nino.butterfly.util.*
 import kotlinx.coroutines.reactive.awaitSingle
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.*
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.core.publisher.toMono
 import java.time.Duration
 
 /**
@@ -68,12 +66,7 @@ class CommandContext(
      * @return a [Mono] returning the message sent if done successfully
      */
     fun replyMono(msg: CharSequence): Mono<Message> {
-        if (guild == null ||
-            (meMember != null && meMember.hasPermission(channel as GuildChannel, Permission.MESSAGE_WRITE))
-        ) {
-            return channel.sendMessage(msg).asMono()
-        }
-        return Mono.empty()
+        return message.replyMono(msg)
     }
 
     /**
@@ -83,12 +76,7 @@ class CommandContext(
      * @return a [Mono] returning the message sent if done successfully
      */
     fun replyMono(msg: Message): Mono<Message> {
-        if (guild == null ||
-            (meMember != null && meMember.hasPermission(channel as GuildChannel, Permission.MESSAGE_WRITE))
-        ) {
-            return channel.sendMessage(msg).asMono()
-        }
-        return Mono.empty()
+        return message.replyMono(msg)
     }
 
     /**
@@ -98,16 +86,7 @@ class CommandContext(
      * @return a [Mono] returning the message sent if done successfully
      */
     fun replyMono(msg: MessageEmbed): Mono<Message> {
-        if (guild == null ||
-            (meMember != null && meMember.hasPermission(
-                channel as GuildChannel,
-                Permission.MESSAGE_WRITE,
-                Permission.MESSAGE_EMBED_LINKS
-            ))
-        ) {
-            return channel.sendMessage(msg).asMono()
-        }
-        return Mono.empty()
+        return message.replyMono(msg)
     }
 
     /**
@@ -117,7 +96,7 @@ class CommandContext(
      * @return a [Message] instance of the message sent
      */
     suspend fun reply(msg: CharSequence): Message {
-        return replyMono(msg).awaitSingle()
+        return message.reply(msg)
     }
 
     /**
@@ -127,7 +106,7 @@ class CommandContext(
      * @return a [Message] instance of the message sent
      */
     suspend fun reply(msg: Message): Message {
-        return replyMono(msg).awaitSingle()
+        return message.reply(msg)
     }
 
     /**
@@ -137,7 +116,7 @@ class CommandContext(
      * @return a [Message] instance of the message sent
      */
     suspend fun reply(msg: MessageEmbed): Message {
-        return replyMono(msg).awaitSingle()
+        return message.reply(msg)
     }
 
     /**
@@ -172,8 +151,8 @@ class CommandContext(
      * @param predicate the predicate that chooses which message to receive.
      * @return a mono of a message
      */
-    fun waitForMessageMono(predicate: (Message) -> Boolean): Mono<Message> {
-        return waitForMessages(predicate).toMono()
+    fun waitForMessageMono(predicate: (Message) -> Boolean = { it.channel == channel && it.author == author }): Mono<Message> {
+        return channel.waitForMessageMono(predicate)
     }
 
     /**
@@ -182,8 +161,8 @@ class CommandContext(
      * @param predicate the predicate that chooses which message to receive.
      * @return a message
      */
-    suspend fun waitForMessage(predicate: (Message) -> Boolean): Message {
-        return waitForMessageMono(predicate).awaitSingle()
+    suspend fun waitForMessage(predicate: (Message) -> Boolean = { it.channel == channel && it.author == author }): Message {
+        return channel.waitForMessage(predicate)
     }
 
 
@@ -194,8 +173,11 @@ class CommandContext(
      * @param timeOut specifies the timeout duration
      * @return a message
      */
-    suspend fun waitForMessage(predicate: (Message) -> Boolean, timeOut: Duration): Message {
-        return waitForMessageMono(predicate).timeout(timeOut).awaitSingle()
+    suspend fun waitForMessage(
+        timeOut: Duration,
+        predicate: (Message) -> Boolean = { it.channel == channel && it.author == author }
+    ): Message {
+        return channel.waitForMessage(timeOut, predicate)
     }
 
 
@@ -205,8 +187,7 @@ class CommandContext(
      * @param predicate the predicate that chooses which messages to receive.
      * @return a flux of messages
      */
-    fun waitForMessages(predicate: (Message) -> Boolean): Flux<Message> {
-        return client.on<MessageReceivedEvent>()
-            .map { it.message }
+    fun waitForMessages(predicate: (Message) -> Boolean = { it.channel == channel && it.author == author }): Flux<Message> {
+        return channel.waitForMessages(predicate)
     }
 }
