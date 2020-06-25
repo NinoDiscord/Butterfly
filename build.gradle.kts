@@ -52,6 +52,10 @@ tasks {
     val dokka by getting(org.jetbrains.dokka.gradle.DokkaTask::class) {
         outputFormat = "html"
         outputDirectory = "$buildDir/dokka"
+        configuration {
+            moduleName = "Butterfly"
+            includes = file("docs").listFiles()!!.map { it.canonicalPath }
+        }
     }
 }
 

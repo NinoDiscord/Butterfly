@@ -1,6 +1,3 @@
-/**
- * Module The Butterfly Discord Framework
- */
 package dev.augu.nino.butterfly
 
 import dev.augu.nino.butterfly.command.Command
@@ -20,11 +17,18 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter
 /**
  * The Butterfly client
  *
- * This class wraps the normal JDA client and has built in support for commands.
+ * This class wraps the normal JDA client and allows access to all of Butterfly's subprojects at ease.
  *
+ * ## Example:
+ * ```
+ * val client = ButterflyClient(jda)
+ *
+ * client.addCommand(command)
+ * ```
  * @property jda the JDA instance
  * @property scope the scope on which to run the coroutines
  * @constructor creates a new ButterflyClient
+ * @param invokeOnMessageEdit whether to invoke on message edit or not
  */
 class ButterflyClient(
     val jda: JDA,

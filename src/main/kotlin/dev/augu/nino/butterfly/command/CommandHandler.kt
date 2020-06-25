@@ -4,8 +4,23 @@ import dev.augu.nino.butterfly.ButterflyClient
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Message
 
+/**
+ * The command handler.
+ *
+ * This class is built in the [ButterflyClient].
+ */
 class CommandHandler(private val client: ButterflyClient) {
+
+    /**
+     * Invokes the handler
+     *
+     * This method is called on any message received.
+     *
+     * @param message the message received
+     */
     suspend fun invoke(message: Message) {
+        if (message.author.isBot) return
+
         var content = message.contentRaw
 
         val prefixes = client.prefixes + client.prefixGetters.mapNotNull { it(message) } // get prefixes
@@ -54,6 +69,12 @@ class CommandHandler(private val client: ButterflyClient) {
     }
 }
 
+/**
+ * Exception thrown on command errors.
+ *
+ * When this exception is thrown inside a command, the client will forward the error to all [CommandErrorHandler] registered.
+ * @param error the command error
+ */
 data class CommandException(val error: CommandError) : RuntimeException(error.reason) {
 
 }

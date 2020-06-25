@@ -1,11 +1,16 @@
 package dev.augu.nino.butterfly.command
 
 import club.minnced.jda.reactor.asMono
+import club.minnced.jda.reactor.on
 import dev.augu.nino.butterfly.ButterflyClient
 import kotlinx.coroutines.reactive.awaitSingle
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.*
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.core.publisher.toMono
+import java.time.Duration
 
 /**
  * The context passed on [Command] invocation.
@@ -159,5 +164,49 @@ class CommandContext(
      */
     suspend fun deleteMessage(reason: String?) {
         deleteMessageMono(reason).awaitSingle()
+    }
+
+    /**
+     * Waits for one message
+     *
+     * @param predicate the predicate that chooses which message to receive.
+     * @return a mono of a message
+     */
+    fun waitForMessageMono(predicate: (Message) -> Boolean): Mono<Message> {
+        return waitForMessages(predicate).toMono()
+    }
+
+    /**
+     * Waits for one message
+     *
+     * @param predicate the predicate that chooses which message to receive.
+     * @return a message
+     */
+    suspend fun waitForMessage(predicate: (Message) -> Boolean): Message {
+        return waitForMessageMono(predicate).awaitSingle()
+    }
+
+
+    /**
+     * Waits for one message
+     *
+     * @param predicate the predicate that chooses which message to receive.
+     * @param timeOut specifies the timeout duration
+     * @return a message
+     */
+    suspend fun waitForMessage(predicate: (Message) -> Boolean, timeOut: Duration): Message {
+        return waitForMessageMono(predicate).timeout(timeOut).awaitSingle()
+    }
+
+
+    /**
+     * Waits for messages
+     *
+     * @param predicate the predicate that chooses which messages to receive.
+     * @return a flux of messages
+     */
+    fun waitForMessages(predicate: (Message) -> Boolean): Flux<Message> {
+        return client.on<MessageReceivedEvent>()
+            .map { it.message }
     }
 }
