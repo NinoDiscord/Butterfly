@@ -44,6 +44,9 @@ configure<JavaPluginConvention> {
     sourceCompatibility = JavaVersion.VERSION_1_8
 }
 
+val demo by sourceSets.creating {
+}
+
 tasks {
     compileKotlin {
         kotlinOptions.jvmTarget = "1.8"
