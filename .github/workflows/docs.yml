@@ -34,3 +34,4 @@ jobs:
         password: ${{ secrets.REMOTE_PASS }}
         source: "build/dokka"
         target: "~/kotlin-docs"
+        override: true
