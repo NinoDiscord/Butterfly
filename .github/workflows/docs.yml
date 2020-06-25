@@ -33,7 +33,6 @@ jobs:
     - name: Create Documentation
       run: ./gradlew dokka
     - run: |
-        chmod -R uo=rw,g=r build/dokka
         mv build/dokka/-butterfly build/dokka/butterfly
     - name: Push to docs server
       uses: appleboy/scp-action@master
@@ -46,6 +45,7 @@ jobs:
         target: "/var/www/docs.augu.dev/dist"
         overwrite: true
         strip_components: 2
+        tar_tmp_path: /tmp/kotlin-docs
 #     - name: Move from kotlin-docs to location
 #       uses: appleboy/ssh-action@master
 #       with:
