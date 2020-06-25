@@ -35,7 +35,7 @@ jobs:
         password: ${{ secrets.REMOTE_PASS }}
         source: "build/dokka/butterfly,build/dokka/style.css"
         target: "/var/www/docs.augu.dev/dist"
-        override: true
+        overwrite: true
         strip_components: 2
 #     - name: Move from kotlin-docs to location
 #       uses: appleboy/ssh-action@master
