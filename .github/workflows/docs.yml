@@ -23,10 +23,11 @@ jobs:
     - name: Set Up Cache
       uses: actions/cache@v2.0.0
       with:
-        path: |
-          .gradle
-          build
-        key: ${{ runner.os }}-gradle-docs-cache
+        path: ~/.gradle/caches
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+            key: ${{ runner.os }}-gradle-docs-cache
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Create Documentation
