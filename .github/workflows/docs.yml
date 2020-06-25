@@ -33,6 +33,6 @@ jobs:
         username: ${{ secrets.REMOTE_USER }}
         password: ${{ secrets.REMOTE_PASS }}
         source: "build/dokka/butterfly,build/dokka/style.css"
-        target: "~/kotlin-docs"
+        target: "/var/www/docs.augu.dev/dist"
         override: true
         strip_components: 2
