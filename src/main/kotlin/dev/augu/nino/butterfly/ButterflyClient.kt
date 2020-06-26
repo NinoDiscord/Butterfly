@@ -1,9 +1,6 @@
 package dev.augu.nino.butterfly
 
-import dev.augu.nino.butterfly.command.Command
-import dev.augu.nino.butterfly.command.CommandErrorHandler
-import dev.augu.nino.butterfly.command.CommandException
-import dev.augu.nino.butterfly.command.CommandHandler
+import dev.augu.nino.butterfly.command.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -33,7 +30,9 @@ import org.slf4j.LoggerFactory
  */
 class ButterflyClient(
     val jda: JDA,
+    val ownerId: String,
     invokeOnMessageEdit: Boolean = false,
+    useDefaultHelpCommand: Boolean = true,
     val scope: CoroutineScope = GlobalScope,
     val guildSettingsLoader: GuildSettingsLoader<*> = object :
         GuildSettingsLoader<GuildSettings> {
@@ -108,7 +107,9 @@ class ButterflyClient(
                 }
             }
         })
-
+        if (useDefaultHelpCommand) {
+            addCommand(DefaultHelpCommand())
+        }
     }
 
     /**
@@ -160,4 +161,30 @@ class ButterflyClient(
      * @return the ButterflyClient instance
      */
     fun JDA.client(): ButterflyClient = this@ButterflyClient
+
+    companion object {
+        fun builder(jda: JDA, ownerId: String): Builder {
+            return Builder(jda, ownerId)
+        }
+
+        class Builder internal constructor(var jda: JDA, var ownerId: String) {
+            var invokeOnMessageEdit: Boolean = false
+            var useDefaultHelpCommand: Boolean = true
+            var scope: CoroutineScope = GlobalScope
+            var guildSettingsLoader: GuildSettingsLoader<*> = object :
+                GuildSettingsLoader<GuildSettings> {
+                override suspend fun load(guild: Guild): GuildSettings = GuildSettings(null)
+            }
+
+            fun build(): ButterflyClient = ButterflyClient(
+                jda,
+                ownerId,
+                invokeOnMessageEdit,
+                useDefaultHelpCommand,
+                scope,
+                guildSettingsLoader
+            )
+
+        }
+    }
 }

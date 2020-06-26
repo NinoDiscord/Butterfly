@@ -46,6 +46,10 @@ class CommandHandler(private val client: ButterflyClient) {
             throw CommandException(NotInGuildError(message, command))
         }
 
+        if (command.ownerOnly && message.author.id != client.ownerId) {
+            throw CommandException(NotOwnerError(message, command))
+        }
+
         if (message.isFromGuild &&
             !message.member!!.hasPermission(
                 message.textChannel,
@@ -74,7 +78,8 @@ class CommandHandler(private val client: ButterflyClient) {
             )
         }
 
-        val ctx = CommandContext(message, command, content.split(" ").toTypedArray(), prefix, client)
+        val ctx =
+            CommandContext(message, command, content.split(" ").filterNot { it == "" }.toTypedArray(), prefix, client)
 
         command.execute(ctx)
     }

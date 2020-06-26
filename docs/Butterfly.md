@@ -1,3 +1,3 @@
 # Package dev.augu.nino.butterfly
 
-The main package, only includes [ButterflyClient].
+The main package, includes types related to all the  subpackages.

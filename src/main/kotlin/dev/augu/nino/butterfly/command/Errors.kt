@@ -14,6 +14,18 @@ data class NotInGuildError(
 ) : CommandError(message, command, "Guild-only command invoked in non-guild environment.")
 
 /**
+ * An error thrown when a user which is not the owner invokes a owner-only command.
+ *
+ * @property message the message that caused the error
+ * @property command the command that had the error
+ */
+data class NotOwnerError(
+    override val message: Message,
+    override val command: Command
+) : CommandError(message, command, "Owner-only command invoked not by the owner.")
+
+
+/**
  * An error thrown when a user invokes a command he does not have the required permissions for.
  *
  * @property message the message that caused the error

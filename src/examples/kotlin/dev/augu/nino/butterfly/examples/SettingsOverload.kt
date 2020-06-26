@@ -56,7 +56,10 @@ object SettingsOverload {
         val jda = JDABuilder
             .createDefault(System.getenv("TOKEN"))
             .build()
-        val client = ButterflyClient(jda, guildSettingsLoader = CustomSettingsLoader)
+        val client = ButterflyClient.builder(jda, "239790360728043520").let {
+            it.guildSettingsLoader = CustomSettingsLoader
+            it.build()
+        }
         client.addPrefix("test!")
         client.addCommand(AddCommand())
         client.addCommand(PrintCommand())

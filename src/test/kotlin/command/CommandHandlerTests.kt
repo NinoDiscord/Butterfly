@@ -23,7 +23,7 @@ import net.dv8tion.jda.api.entities.*
 class CommandHandlerTests : DescribeSpec({
     val coroutinescope = CoroutineScope(newSingleThreadContext("Command Thread"))
     val jda = mockk<JDA>(relaxed = true)
-    val client = spyk(ButterflyClient(jda, scope = coroutinescope))
+    val client = spyk(ButterflyClient(jda, "239790360728043520", scope = coroutinescope))
     val handler = CommandHandler(client)
     val message = mockk<Message>(relaxed = true)
     val command = spyk<Command>(object : Command(
@@ -86,6 +86,65 @@ class CommandHandlerTests : DescribeSpec({
             }
 
             confirmVerified(command)
+        }
+
+        it("should not run an owner-only command if the user is not the owner") {
+            val guild = mockk<Guild>(relaxed = true)
+            val guildChannel = mockk<TextChannel>(relaxed = true)
+            val member = mockk<Member>(relaxed = true)
+
+            every { message.author.id } returns "0"
+            every { message.author.isBot } returns false
+            every { command.ownerOnly } returns true
+            every { message.isFromGuild } returns true
+            every { message.guild } returns guild
+            every { message.member } returns member
+            every { message.textChannel } returns guildChannel
+            every { message.contentRaw } returns "x!test"
+            every { member.permissions } returns Permission.getPermissions(0)
+            every { member.hasPermission(any(), any<Collection<Permission>>()) } returns true
+
+            shouldThrowMessage("Owner-only command invoked not by the owner.") {
+                runBlocking {
+                    handler.invoke(message)
+                }
+            }
+
+            coVerify(exactly = 0) {
+                command.execute(any())
+            }
+        }
+
+        it("should run an owner-only command if the user is the owner") {
+            val guild = mockk<Guild>(relaxed = true)
+            val guildChannel = mockk<TextChannel>(relaxed = true)
+            val member = mockk<Member>(relaxed = true)
+            val sampleMsg = mockk<Message>(relaxed = true)
+
+            every { message.author.id } returns "239790360728043520"
+            every { message.author.isBot } returns false
+            every { command.ownerOnly } returns true
+            every { message.isFromGuild } returns true
+            every { message.guild } returns guild
+            every { message.member } returns member
+            every { message.textChannel } returns guildChannel
+            every { message.contentRaw } returns "x!test"
+            every { member.permissions } returns Permission.getPermissions(0)
+            every { member.hasPermission(any(), any<Collection<Permission>>()) } returns true
+            every { guild.selfMember.hasPermission(any(), any<Collection<Permission>>()) } returns true
+
+            mockkStatic("dev.augu.nino.butterfly.util.MessageExtensions") // in order to mock the reply extension function.
+            coEvery { message.reply(any<CharSequence>()) } returns sampleMsg
+
+            shouldNotThrow<Exception> {
+                runBlocking {
+                    handler.invoke(message)
+                }
+            }
+
+            coVerify(exactly = 1) {
+                command.execute(any())
+            }
         }
 
         it("should not run a command if the user doesn't have enough permissions") {

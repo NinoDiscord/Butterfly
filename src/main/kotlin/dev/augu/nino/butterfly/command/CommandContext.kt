@@ -7,6 +7,7 @@ import dev.augu.nino.butterfly.util.*
 import kotlinx.coroutines.reactive.awaitSingle
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.*
+import net.dv8tion.jda.api.exceptions.PermissionException
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.Duration
@@ -135,7 +136,14 @@ class CommandContext(
      * @return a [Message] instance of the message sent
      */
     suspend fun reply(msg: MessageEmbed): Message {
-        return message.reply(msg)
+        try {
+            return message.reply(msg)
+        } catch (c: PermissionException) {
+            if (c.permission.equals(Permission.MESSAGE_EMBED_LINKS)) {
+                message.reply("This bot is missing the Message Embed Links permission.")
+            }
+            throw c // Rethrow the error
+        }
     }
 
     /**

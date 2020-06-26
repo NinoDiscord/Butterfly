@@ -4,7 +4,6 @@ package dev.augu.nino.butterfly.util
 
 import club.minnced.jda.reactor.asMono
 import kotlinx.coroutines.reactive.awaitSingle
-import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
 import reactor.core.publisher.Mono
@@ -17,12 +16,7 @@ import reactor.core.publisher.Mono
  * @return a [Mono] returning the message sent if done successfully
  */
 fun Message.replyMono(msg: CharSequence): Mono<Message> {
-    if (!isFromGuild ||
-        (guild.selfMember.hasPermission(textChannel, Permission.MESSAGE_WRITE))
-    ) {
-        return channel.sendMessage(msg).asMono()
-    }
-    return Mono.empty()
+    return channel.sendMessage(msg).asMono()
 }
 
 /**
@@ -32,12 +26,7 @@ fun Message.replyMono(msg: CharSequence): Mono<Message> {
  * @return a [Mono] returning the message sent if done successfully
  */
 fun Message.replyMono(msg: Message): Mono<Message> {
-    if (!isFromGuild ||
-        (guild.selfMember.hasPermission(textChannel, Permission.MESSAGE_WRITE))
-    ) {
-        return channel.sendMessage(msg).asMono()
-    }
-    return Mono.empty()
+    return channel.sendMessage(msg).asMono()
 }
 
 /**
@@ -47,16 +36,7 @@ fun Message.replyMono(msg: Message): Mono<Message> {
  * @return a [Mono] returning the message sent if done successfully
  */
 fun Message.replyMono(msg: MessageEmbed): Mono<Message> {
-    if (!isFromGuild ||
-        (guild.selfMember.hasPermission(
-            textChannel,
-            Permission.MESSAGE_WRITE,
-            Permission.MESSAGE_EMBED_LINKS
-        ))
-    ) {
-        return channel.sendMessage(msg).asMono()
-    }
-    return Mono.empty()
+    return channel.sendMessage(msg).asMono()
 }
 
 /**
