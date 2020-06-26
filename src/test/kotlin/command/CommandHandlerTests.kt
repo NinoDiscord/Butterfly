@@ -1,6 +1,8 @@
 package command
 
 import dev.augu.nino.butterfly.ButterflyClient
+import dev.augu.nino.butterfly.GuildSettings
+import dev.augu.nino.butterfly.GuildSettingsLoader
 import dev.augu.nino.butterfly.command.Command
 import dev.augu.nino.butterfly.command.CommandContext
 import dev.augu.nino.butterfly.command.CommandException
@@ -21,7 +23,7 @@ import net.dv8tion.jda.api.entities.*
 class CommandHandlerTests : DescribeSpec({
     val coroutinescope = CoroutineScope(newSingleThreadContext("Command Thread"))
     val jda = mockk<JDA>(relaxed = true)
-    val client = ButterflyClient(jda, scope = coroutinescope)
+    val client = spyk(ButterflyClient(jda, scope = coroutinescope))
     val handler = CommandHandler(client)
     val message = mockk<Message>(relaxed = true)
     val command = spyk<Command>(object : Command(
@@ -133,6 +135,44 @@ class CommandHandlerTests : DescribeSpec({
                     handler.invoke(message)
                 }
             }
+        }
+
+        it("should run the command with custom guild prefix") {
+            val guild = mockk<Guild>(relaxed = true)
+            val guildChannel = mockk<TextChannel>(relaxed = true)
+            val member = mockk<Member>(relaxed = true)
+            val me = mockk<Member>(relaxed = true)
+            val sampleMsg = mockk<Message>(relaxed = true)
+            val customSettingsLoader = object : GuildSettingsLoader<GuildSettings> {
+                override suspend fun load(guild: Guild): GuildSettings = GuildSettings("z!")
+            }
+
+            every { client.guildSettingsLoader } returns customSettingsLoader
+            every { message.isFromGuild } returns true
+            every { message.channel } returns guildChannel
+            every { message.textChannel } returns guildChannel
+            every { member.permissions } returns Permission.getPermissions(Permission.MESSAGE_WRITE.rawValue)
+            every { member.hasPermission(any(), any<Collection<Permission>>()) } returns true
+            every { me.hasPermission(any(), any<Collection<Permission>>()) } returns true
+            every { me.hasPermission(any<GuildChannel>(), *anyVararg<Permission>()) } returns true
+            every { message.member } returns member
+            every { me.permissions } returns Permission.getPermissions(0)
+            every { guild.selfMember } returns me
+            every { message.guild } returns guild
+            every { message.contentRaw } returns "z!test"
+
+            mockkStatic("dev.augu.nino.butterfly.util.MessageExtensions") // in order to mock the reply extension function.
+            coEvery { message.reply(any<CharSequence>()) } returns sampleMsg
+
+            shouldNotThrow<CommandException> {
+                runBlocking {
+                    handler.invoke(message)
+                }
+            }
+
+            coVerify(exactly = 1) { command.execute(any()) }
+
+            coVerify(exactly = 1) { message.reply("test") }
         }
 
         it("should run the command if all of the requirements are met") {

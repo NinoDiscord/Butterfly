@@ -8,6 +8,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent
@@ -25,13 +26,19 @@ import org.slf4j.LoggerFactory
  * @sample dev.augu.nino.butterfly.examples.ExampleBot
  * @property jda the JDA instance
  * @property scope the scope on which to run the coroutines
+ * @property guildSettingsLoader a [GuildSettings] loader, by default it loads an empty settings.
+ * This function is called by the [CommandHandler] in order to add the guild prefix to the list.
  * @constructor creates a new ButterflyClient
  * @param invokeOnMessageEdit whether to invoke on message edit or not
  */
 class ButterflyClient(
     val jda: JDA,
     invokeOnMessageEdit: Boolean = false,
-    val scope: CoroutineScope = GlobalScope
+    val scope: CoroutineScope = GlobalScope,
+    val guildSettingsLoader: GuildSettingsLoader<*> = object :
+        GuildSettingsLoader<GuildSettings> {
+        override suspend fun load(guild: Guild): GuildSettings = GuildSettings(null)
+    }
 ) : JDA by jda {
 
     /**
@@ -52,7 +59,7 @@ class ButterflyClient(
     /**
      * A list of prefixGetters
      */
-    val prefixGetters: ArrayList<suspend (Message) -> String?> = ArrayList()
+    val prefixLoaders: ArrayList<suspend (Message) -> String?> = ArrayList()
 
     /**
      * A list of [CommandErrorHandler]s
@@ -133,7 +140,7 @@ class ButterflyClient(
      * @param getter the prefix getter to add
      */
     fun addPrefixGetter(getter: suspend (Message) -> String) {
-        prefixGetters.add(getter)
+        prefixLoaders.add(getter)
     }
 
     /**

@@ -2,6 +2,7 @@ package dev.augu.nino.butterfly.command
 
 import club.minnced.jda.reactor.asMono
 import dev.augu.nino.butterfly.ButterflyClient
+import dev.augu.nino.butterfly.GuildSettings
 import dev.augu.nino.butterfly.util.*
 import kotlinx.coroutines.reactive.awaitSingle
 import net.dv8tion.jda.api.Permission
@@ -20,6 +21,7 @@ import java.time.Duration
  * @property args The arguments passed
  * @property prefix The command prefix
  * @property client The [ButterflyClient] instance
+ * @property settings The guild settings
  */
 class CommandContext(
     val message: Message,
@@ -58,6 +60,23 @@ class CommandContext(
      * This bot as a [Member]
      */
     val meMember: Member? = message.guild.selfMember
+
+    /**
+     * Fetches the guild settings
+     *
+     * @param T the settings type
+     * @return the guild settings if in the guild
+     */
+    suspend inline fun <reified T : GuildSettings> settings(): T? {
+        if (guild == null) {
+            return null
+        }
+        val s = client.guildSettingsLoader.load(guild)
+        if (s !is T) {
+            return null
+        }
+        return s
+    }
 
     /**
      * Sends a message in the same channel as the context's

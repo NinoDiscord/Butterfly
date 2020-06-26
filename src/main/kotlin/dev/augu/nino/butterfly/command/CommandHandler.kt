@@ -1,6 +1,7 @@
 package dev.augu.nino.butterfly.command
 
 import dev.augu.nino.butterfly.ButterflyClient
+import dev.augu.nino.butterfly.GuildSettings
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Message
 
@@ -22,8 +23,18 @@ class CommandHandler(private val client: ButterflyClient) {
         if (message.author.isBot) return
 
         var content = message.contentRaw
+        val settings: GuildSettings?
+        if (message.isFromGuild) {
+            settings = client.guildSettingsLoader.load(message.guild)
+        } else {
+            settings = null
+        }
 
-        val prefixes = client.prefixes + client.prefixGetters.mapNotNull { it(message) } // get prefixes
+        val prefixes =
+            (client.prefixes + (client.prefixLoaders).mapNotNull { it(message) }).toMutableList() // get prefixes
+        if (settings?.prefix != null) {
+            prefixes += settings.prefix!!
+        }
         val prefix = prefixes.find { content.startsWith(it) } ?: return // find if one of the prefixes matches
         content = content.removePrefix(prefix).trimStart()
 

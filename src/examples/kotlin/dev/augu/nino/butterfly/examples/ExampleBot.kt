@@ -1,4 +1,4 @@
-@file:JvmName("Main")
+@file:JvmName("MainExample")
 
 package dev.augu.nino.butterfly.examples
 
