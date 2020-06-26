@@ -27,8 +27,8 @@ class DefaultHelpCommand : Command(
                 builder.setDescription("To get more information on a specific command, do ${ctx.prefix}help <Command>")
                 commands
                     .values
-                    .filter { visible }
-                    .groupBy { category }
+                    .filter { it.visible }
+                    .groupBy { it.category }
                     .map {
                         MessageEmbed.Field(it.key, categoryValuesToDisplay(it.value), false)
                     }.forEach {

@@ -2,6 +2,7 @@ package command
 
 import dev.augu.nino.butterfly.command.Command
 import dev.augu.nino.butterfly.command.CommandContext
+import dev.augu.nino.butterfly.command.DefaultHelpCommand
 import dev.augu.nino.butterfly.util.edit
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.core.spec.style.DescribeSpec
@@ -9,8 +10,10 @@ import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.mockk.*
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import net.dv8tion.jda.api.entities.Message
+import net.dv8tion.jda.api.entities.MessageEmbed
 import java.time.Duration
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
@@ -61,6 +64,43 @@ class CommandIntegrationTests : DescribeSpec({
 
             coVerify(exactly = 1) { ctx.reply("Calculating...") }
             coVerify(exactly = 1) { msg.edit("Ping: 5000ms | Websocket: 5ms") }
+
+        }
+    }
+
+    describe("Integration Test - Help Command") {
+        val command = spyk(DefaultHelpCommand())
+
+        beforeTest {
+            clearAllMocks()
+        }
+
+        it("No arguments should list the visible commands") {
+            val visibleTestCommand = object : Command("visible", "simple") {
+                override suspend fun execute(ctx: CommandContext) {}
+            }
+            val invisibleTestCommand = object : Command("invisible", "simple", visible = false) {
+                override suspend fun execute(ctx: CommandContext) {}
+            }
+            val commands = mutableMapOf("invisible" to invisibleTestCommand, "visible" to visibleTestCommand)
+            val ctx = mockk<CommandContext>(relaxed = true)
+            every { ctx.client.commands } returns commands
+            every { ctx.args } returns arrayOf()
+            every { ctx.client.selfUser.name } returns "Test"
+
+            shouldNotThrow<Exception> {
+                runBlocking {
+                    command.execute(ctx)
+                }
+            }
+
+            coVerify(exactly = 1) {
+                ctx.reply(match<MessageEmbed> {
+                    it.title == "Help - Test" &&
+                            it.fields[0].name == "simple" &&
+                            it.fields[0].value == "`visible`"
+                })
+            }
 
         }
     }

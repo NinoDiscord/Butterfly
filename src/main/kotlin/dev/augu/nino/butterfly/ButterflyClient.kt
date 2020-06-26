@@ -43,27 +43,27 @@ class ButterflyClient(
     /**
      * A map of commands
      */
-    val commands: HashMap<String, Command> = HashMap()
+    val commands: MutableMap<String, Command> = HashMap()
 
     /**
      * A map of commands by their aliases
      */
-    val aliases: HashMap<String, Command> = HashMap()
+    val aliases: MutableMap<String, Command> = HashMap()
 
     /**
      * A list of prefixes
      */
-    val prefixes: ArrayList<String> = ArrayList()
+    val prefixes: MutableList<String> = ArrayList()
 
     /**
      * A list of prefixGetters
      */
-    val prefixLoaders: ArrayList<suspend (Message) -> String?> = ArrayList()
+    val prefixLoaders: MutableList<suspend (Message) -> String?> = ArrayList()
 
     /**
      * A list of [CommandErrorHandler]s
      */
-    val commandErrorHandlers: ArrayList<CommandErrorHandler> = ArrayList()
+    val commandErrorHandlers: MutableList<CommandErrorHandler> = ArrayList()
 
     /**
      * Logger
