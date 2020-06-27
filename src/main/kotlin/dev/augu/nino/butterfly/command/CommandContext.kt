@@ -3,8 +3,10 @@ package dev.augu.nino.butterfly.command
 import club.minnced.jda.reactor.asMono
 import dev.augu.nino.butterfly.ButterflyClient
 import dev.augu.nino.butterfly.GuildSettings
+import dev.augu.nino.butterfly.i18n.I18nLanguage
 import dev.augu.nino.butterfly.util.*
 import kotlinx.coroutines.reactive.awaitSingle
+import kotlinx.coroutines.reactor.mono
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.exceptions.PermissionException
@@ -80,6 +82,17 @@ class CommandContext(
     }
 
     /**
+     * Returns the [I18nLanguage] for this context.
+     *
+     * If in the guild and a language is set, it defaults to that, otherwise it uses the client's default language.
+     *
+     * @return the [I18nLanguage] if set
+     */
+    suspend fun language(): I18nLanguage? {
+        return settings<GuildSettings>()?.language ?: client.defaultLanguage
+    }
+
+    /**
      * Sends a message in the same channel as the context's
      *
      * @param msg The message to send
@@ -107,6 +120,23 @@ class CommandContext(
      */
     fun replyMono(msg: MessageEmbed): Mono<Message> {
         return message.replyMono(msg)
+    }
+
+    /**
+     * Sends a translated message in the same channel as the context's
+     *
+     * @param key the key of the translation
+     * @param args the arguments for the translation
+     * @param language the language to use
+     * By default, it falls back to the guild language and if null, falls back to the client default language, if null it errors.
+     * @return a [Mono] returning the message sent if done successfully
+     */
+    fun replyTranslateMono(
+        key: String,
+        args: Map<String, String> = mapOf(),
+        language: I18nLanguage? = null
+    ): Mono<Message> {
+        return mono { replyTranslate(key, args) }
     }
 
     /**
@@ -144,6 +174,24 @@ class CommandContext(
             }
             throw c // Rethrow the error
         }
+    }
+
+    /**
+     * Sends a translated message in the same channel as the context's
+     *
+     * @param key the key of the translation
+     * @param args the arguments for the translation
+     * @param language the language to use
+     * By default, it falls back to the guild language and if null, falls back to the client default language, if null it errors.
+     * @return a [Message] instance of the message sent
+     */
+    suspend fun replyTranslate(
+        key: String,
+        args: Map<String, String> = mapOf(),
+        language: I18nLanguage? = null
+    ): Message {
+        val lang = language ?: this.language() ?: throw IllegalStateException("No language found.")
+        return reply(lang.translate(key, args))
     }
 
     /**

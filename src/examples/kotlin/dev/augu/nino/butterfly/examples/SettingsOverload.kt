@@ -16,7 +16,7 @@ import net.dv8tion.jda.api.entities.Guild
  * @property prefix the guild prefix
  * @property counter counts the number of command calls for each guild.
  */
-class CustomSettings(override val prefix: String?, var counter: Int) : GuildSettings(prefix) {
+class CustomSettings(override var prefix: String?, var counter: Int) : GuildSettings(prefix, null) {
     suspend fun save() {
         // Save to a database
     }

@@ -4,6 +4,11 @@ package dev.augu.nino.butterfly.i18n
  * A language
  *
  * This class offers translation tables for languages, this allows easy, language-agnostic internationalization.
+ *
+ * The format of the translation is: "Regular string ${key} continuing regular string".
+ *
+ * ## Example
+ * @sample dev.augu.nino.butterfly.examples.LanguageBot
  * @property translationTable the translation table to fetch format keys from
  */
 open class I18nLanguage(private val translationTable: Map<String, String>) {
