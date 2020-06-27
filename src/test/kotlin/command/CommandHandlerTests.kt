@@ -203,7 +203,7 @@ class CommandHandlerTests : DescribeSpec({
             val me = mockk<Member>(relaxed = true)
             val sampleMsg = mockk<Message>(relaxed = true)
             val customSettingsLoader = object : GuildSettingsLoader<GuildSettings> {
-                override suspend fun load(guild: Guild): GuildSettings = GuildSettings("z!")
+                override suspend fun load(guild: Guild): GuildSettings = GuildSettings("z!", null)
             }
 
             every { client.guildSettingsLoader } returns customSettingsLoader
