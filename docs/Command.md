@@ -3,7 +3,7 @@
 The command package, includes all data types of the command system.
 
 ## How to use
-The command handler is already built-in the [ButterFly] client.
+The command handler is already built-in the [ButterflyClient].
 
 To add a command use the `client.addCommand(command)` method.
 

@@ -73,11 +73,15 @@ tasks {
         configuration {
             moduleName = "Butterfly"
             includes = file("docs").listFiles()!!.map { it.canonicalPath }
+            samples += file("src/examples/kotlin/dev/augu/nino/butterfly/examples").listFiles()!!
+                .map { it.canonicalPath }
             externalDocumentationLink {
-                samples += file("src/examples/kotlin/dev/augu/nino/butterfly/examples").listFiles()!!
-                    .map { it.canonicalPath }
                 url = URL("https://ci.dv8tion.net/job/JDA/javadoc/index.html")
                 packageListUrl = URL("https://ci.dv8tion.net/job/JDA/javadoc/element-list")
+            }
+            externalDocumentationLink {
+                url = URL("https://projectreactor.io/docs/core/release/api/")
+                packageListUrl = URL("https://projectreactor.io/docs/core/release/api/package-list")
             }
         }
     }
