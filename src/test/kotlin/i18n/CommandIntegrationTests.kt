@@ -1,76 +1,29 @@
-package command
+package i18n
 
 import dev.augu.nino.butterfly.command.Command
 import dev.augu.nino.butterfly.command.CommandContext
 import dev.augu.nino.butterfly.command.DefaultHelpCommand
-import dev.augu.nino.butterfly.util.edit
+import dev.augu.nino.butterfly.i18n.I18nLanguage
 import io.kotest.assertions.throwables.shouldNotThrow
 import io.kotest.core.spec.style.DescribeSpec
-import io.kotest.matchers.booleans.shouldBeTrue
-import io.kotest.matchers.collections.shouldHaveSize
-import io.kotest.matchers.shouldBe
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
-import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
-import java.time.Duration
-import java.time.OffsetDateTime
-import java.time.temporal.ChronoUnit
 
 class CommandIntegrationTests : DescribeSpec({
-    describe("Integration Test - Ping Command") {
-        // The Ping example from JDA-Utilities, redone in Butterfly!
-        class PingCommand : Command("ping", "generic", "pong", guildOnly = true) {
-            override suspend fun execute(ctx: CommandContext) {
-                val msg = ctx.reply("Calculating...")
-                val ping = ctx.message.timeCreated.until(msg.timeCreated, ChronoUnit.MILLIS)
-                msg.edit("Ping: ${ping}ms | Websocket: ${ctx.client.gatewayPing}ms")
-            }
-        }
-
-        val cmd = spyk<Command>(PingCommand())
-        beforeTest {
-            clearAllMocks()
-        }
-
-        it("Simple Tests") {
-            cmd.name.shouldBe("ping")
-            cmd.category.shouldBe("generic")
-            cmd.aliases[0].shouldBe("pong")
-            cmd.aliases.shouldHaveSize(1)
-            cmd.guildOnly.shouldBeTrue()
-        }
-
-        it("Integration Test") {
-            val ctx = mockk<CommandContext>(relaxed = true)
-            val msg = mockk<Message>(relaxed = true)
-            val time = OffsetDateTime.now()
-
-            every { ctx.client.gatewayPing } returns 5
-            every { ctx.message.timeCreated } returns time
-            coEvery { ctx.language() } returns null
-            every { msg.timeCreated } returns time + Duration.of(5, ChronoUnit.SECONDS)
-            coEvery { ctx.reply(any<CharSequence>()) } coAnswers {
-                msg
-            }
-            mockkStatic("dev.augu.nino.butterfly.util.MessageExtensions")
-            coEvery { msg.edit(any<CharSequence>()) } returns msg
-
-            shouldNotThrow<Exception> {
-                runBlockingTest {
-                    cmd.execute(ctx)
-                }
-            }
-
-            coVerify(exactly = 1) { ctx.reply("Calculating...") }
-            coVerify(exactly = 1) { msg.edit("Ping: 5000ms | Websocket: 5ms") }
-
-        }
-    }
-
-    describe("Integration Test - Help Command") {
+    describe("Integration Test - Help Command - I18n") {
         val command = spyk(DefaultHelpCommand())
+        val hebrew = spyk(
+            I18nLanguage(
+                mapOf(
+                    "helpCommandTitle" to "עזרה - \${botName}",
+                    "helpCommandDescription" to "בכדי לקבל עזרה בפקודה מסוימת, תעשה \${prefix}help <פקודה>",
+                    "helpCommandNotFound" to "פקודה לא נמצאה.",
+                    "helpCommandDocTitle" to "פקודה - \${commandName}",
+                    "helpCommandDocDescription" to "\${commandDesc}"
+                )
+            )
+        )
 
         beforeTest {
             clearAllMocks()
@@ -87,8 +40,9 @@ class CommandIntegrationTests : DescribeSpec({
             val ctx = mockk<CommandContext>(relaxed = true)
             every { ctx.client.commands } returns commands
             every { ctx.args } returns arrayOf()
-            coEvery { ctx.language() } returns null
+            every { ctx.prefix } returns "!"
             every { ctx.client.selfUser.name } returns "Test"
+            coEvery { ctx.language() } returns hebrew
 
             shouldNotThrow<Exception> {
                 runBlocking {
@@ -98,8 +52,9 @@ class CommandIntegrationTests : DescribeSpec({
 
             coVerify(exactly = 1) {
                 ctx.reply(match<MessageEmbed> {
-                    it.title == "Help - Test" &&
-                            it.fields[0].name == "simple" &&
+                    it.title == "עזרה - Test" &&
+                            it.description == "בכדי לקבל עזרה בפקודה מסוימת, תעשה !help <פקודה>"
+                    it.fields[0].name == "simple" &&
                             it.fields[0].value == "`visible`"
                 })
             }
@@ -116,8 +71,8 @@ class CommandIntegrationTests : DescribeSpec({
             val ctx = mockk<CommandContext>(relaxed = true)
             every { ctx.client.commands } returns commands
             every { ctx.args } returns arrayOf("visible")
-            coEvery { ctx.language() } returns null
             every { ctx.client.selfUser.name } returns "Test"
+            coEvery { ctx.language() } returns hebrew
 
             shouldNotThrow<Exception> {
                 runBlocking {
@@ -127,7 +82,7 @@ class CommandIntegrationTests : DescribeSpec({
 
             coVerify(exactly = 1) {
                 ctx.reply(match<MessageEmbed> {
-                    it.title == "Command visible" &&
+                    it.title == "פקודה - visible" &&
                             it.description == "A visible command."
                 })
             }
@@ -146,8 +101,8 @@ class CommandIntegrationTests : DescribeSpec({
             every { ctx.client.commands } returns commands
             every { ctx.client.aliases } returns mutableMapOf()
             every { ctx.args } returns arrayOf("errorous")
-            coEvery { ctx.language() } returns null
             every { ctx.client.selfUser.name } returns "Test"
+            coEvery { ctx.language() } returns hebrew
 
             shouldNotThrow<Exception> {
                 runBlocking {
@@ -156,7 +111,7 @@ class CommandIntegrationTests : DescribeSpec({
             }
 
             coVerify(exactly = 1) {
-                ctx.reply("Command not found.")
+                ctx.reply("פקודה לא נמצאה.")
             }
 
         }
