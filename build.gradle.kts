@@ -1,14 +1,22 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.jfrog.bintray.gradle.BintrayExtension
+import com.jfrog.bintray.gradle.tasks.BintrayUploadTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.net.URL
+import java.util.*
 
 plugins {
     java
     kotlin("jvm") version "1.3.72"
     id("org.jetbrains.dokka") version "0.10.1"
+    id("com.jfrog.bintray") version "1.8.5"
+    `maven-publish`
+    id("com.github.johnrengelman.shadow") version "5.1.0"
 }
 
+val artifact = "Butterfly"
 group = "dev.augu.nino"
-version = "1.0-SNAPSHOT"
+version = "0.1.0"
 
 
 repositories {
@@ -93,4 +101,62 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+val shadowJar: ShadowJar by tasks
+
+shadowJar.apply {
+    archiveBaseName.set(artifact)
+    archiveClassifier.set(null as String?)
+}
+
+val sourcesJar = task<Jar>("sourcesJar") {
+    archiveClassifier.set("sources")
+    from("src/main/kotlin")
+}
+
+val javadocJar = task<Jar>("javadocJar") {
+    archiveClassifier.set("javadoc")
+    from(tasks.dokka)
+}
+
+publishing {
+    publications {
+        register("BintrayPublication", MavenPublication::class.java) {
+            from(components["java"])
+            artifactId = artifact
+            groupId = project.group as String
+            version = project.version as String
+            artifact(sourcesJar)
+            artifact(javadocJar)
+        }
+    }
+}
+
+val bintrayUpload: BintrayUploadTask by tasks
+
+bintrayUpload.apply {
+    onlyIf {
+        System.getenv("BINTRAY_USER") != null
+    }
+    onlyIf {
+        System.getenv("BINTRAY_KEY") != null
+    }
+}
+
+bintray {
+    user = System.getenv("BINTRAY_USER")
+    key = System.getenv("BINTRAY_KEY")
+    setPublications("BintrayPublication")
+    pkg(delegateClosureOf<BintrayExtension.PackageConfig> {
+        repo = "oss-maven"
+        name = "Butterfly"
+        userOrg = "dondishorg"
+        vcsUrl = "https://github.com/NinoDiscord/Butterfly.git"
+        publish = true
+        version(delegateClosureOf<BintrayExtension.VersionConfig> {
+            name = project.version as String
+            released = Date().toString()
+        })
+    })
 }
