@@ -139,7 +139,7 @@ class CommandContext(
         try {
             return message.reply(msg)
         } catch (c: PermissionException) {
-            if (c.permission.equals(Permission.MESSAGE_EMBED_LINKS)) {
+            if (c.permission == Permission.MESSAGE_EMBED_LINKS) {
                 message.reply("This bot is missing the Message Embed Links permission.")
             }
             throw c // Rethrow the error
