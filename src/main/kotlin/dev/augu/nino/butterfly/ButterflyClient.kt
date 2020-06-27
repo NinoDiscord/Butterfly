@@ -126,11 +126,15 @@ class ButterflyClient(
      * Adds a command
      *
      * @param cmd the command to add
+     * @param cmds more commands to add
      */
-    fun addCommand(cmd: Command) {
+    fun addCommand(cmd: Command, vararg cmds: Command) {
         commands[cmd.name] = cmd
         for (alias in cmd.aliases) {
             aliases[alias] = cmd
+        }
+        for (command in cmds) {
+            addCommand(command)
         }
     }
 
@@ -148,9 +152,13 @@ class ButterflyClient(
      * Adds a prefix
      *
      * @param prefix the prefix to add
+     * @param prefixes additional prefixes to add
      */
-    fun addPrefix(prefix: String) {
-        prefixes.add(prefix)
+    fun addPrefix(prefix: String, vararg prefixes: String) {
+        this.prefixes.add(prefix)
+        for (pfix in prefixes) {
+            this.prefixes.add(pfix)
+        }
     }
 
     /**
@@ -159,9 +167,13 @@ class ButterflyClient(
      * Prefix getters are suspended functions that return a prefix.
      *
      * @param getter the prefix getter to add
+     * @param getters additional prefix getters to add
      */
-    fun addPrefixGetter(getter: suspend (Message) -> String) {
+    fun addPrefixGetter(getter: suspend (Message) -> String, vararg getters: suspend (Message) -> String) {
         prefixLoaders.add(getter)
+        for (gtr in getters) {
+            prefixLoaders.add(gtr)
+        }
     }
 
     /**
@@ -169,10 +181,14 @@ class ButterflyClient(
      *
      * Error handlers are special classes that can handle command errors
      *
-     * @param handler the command handler to add
+     * @param handler the command error handler to add
+     * @param handlers additional command error handlers to add
      */
-    fun addErrorHandler(handler: CommandErrorHandler) {
+    fun addErrorHandler(handler: CommandErrorHandler, vararg handlers: CommandErrorHandler) {
         commandErrorHandlers.add(handler)
+        for (hndlr in handlers) {
+            commandErrorHandlers.add(hndlr)
+        }
     }
 
     /**

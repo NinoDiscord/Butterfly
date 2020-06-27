@@ -12,8 +12,7 @@ object ExampleBot {
             .build()
         val client = ButterflyClient.builder(jda, "239790360728043520").build()
         client.addPrefix("test!")
-        client.addCommand(EchoCommand())
-        client.addCommand(PingCommand())
+        client.addCommand(EchoCommand(), PingCommand())
     }
 }
 

@@ -108,9 +108,7 @@ object LanguageBot {
         client.addLanguage("english", english)
         client.addLanguage("עברית", hebrew)
         client.addLanguage("русский", russian)
-        client.addCommand(ExampleCommand())
-        client.addCommand(GreetCommand())
-        client.addCommand(ChangeCommand())
+        client.addCommand(ExampleCommand(), GreetCommand(), ChangeCommand())
     }
 }
 
