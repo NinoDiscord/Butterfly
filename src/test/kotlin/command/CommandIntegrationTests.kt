@@ -103,5 +103,58 @@ class CommandIntegrationTests : DescribeSpec({
             }
 
         }
+        it("Command argument should return the command help.") {
+            val visibleTestCommand = object : Command("visible", "simple", description = "A visible command.") {
+                override suspend fun execute(ctx: CommandContext) {}
+            }
+            val invisibleTestCommand = object : Command("invisible", "simple", visible = false) {
+                override suspend fun execute(ctx: CommandContext) {}
+            }
+            val commands = mutableMapOf("invisible" to invisibleTestCommand, "visible" to visibleTestCommand)
+            val ctx = mockk<CommandContext>(relaxed = true)
+            every { ctx.client.commands } returns commands
+            every { ctx.args } returns arrayOf("visible")
+            every { ctx.client.selfUser.name } returns "Test"
+
+            shouldNotThrow<Exception> {
+                runBlocking {
+                    command.execute(ctx)
+                }
+            }
+
+            coVerify(exactly = 1) {
+                ctx.reply(match<MessageEmbed> {
+                    it.title == "Command visible" &&
+                            it.description == "A visible command."
+                })
+            }
+
+        }
+
+        it("Invalid command argument should return command not found.") {
+            val visibleTestCommand = object : Command("visible", "simple", description = "A visible command.") {
+                override suspend fun execute(ctx: CommandContext) {}
+            }
+            val invisibleTestCommand = object : Command("invisible", "simple", visible = false) {
+                override suspend fun execute(ctx: CommandContext) {}
+            }
+            val commands = mutableMapOf("invisible" to invisibleTestCommand, "visible" to visibleTestCommand)
+            val ctx = mockk<CommandContext>(relaxed = true)
+            every { ctx.client.commands } returns commands
+            every { ctx.client.aliases } returns mutableMapOf()
+            every { ctx.args } returns arrayOf("errorous")
+            every { ctx.client.selfUser.name } returns "Test"
+
+            shouldNotThrow<Exception> {
+                runBlocking {
+                    command.execute(ctx)
+                }
+            }
+
+            coVerify(exactly = 1) {
+                ctx.reply("Command not found.")
+            }
+
+        }
     }
 })

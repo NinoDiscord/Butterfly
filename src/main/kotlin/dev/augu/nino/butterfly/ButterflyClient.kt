@@ -22,6 +22,7 @@ import org.slf4j.LoggerFactory
  * ## Example:
  * @sample dev.augu.nino.butterfly.examples.ExampleBot
  * @property jda the JDA instance
+ * @property ownerId the owner's id, necessary for the command system to function
  * @property scope the scope on which to run the coroutines
  * @property guildSettingsLoader a [GuildSettings] loader, by default it loads an empty settings.
  * This function is called by the [CommandHandler] in order to add the guild prefix to the list.
