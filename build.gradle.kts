@@ -16,7 +16,7 @@ plugins {
 
 val artifact = "Butterfly"
 group = "dev.augu.nino"
-version = "0.1.0"
+version = "0.1.1"
 
 
 repositories {
