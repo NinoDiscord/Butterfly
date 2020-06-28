@@ -72,7 +72,7 @@ class CommandGroup(
                     ctx.client
                 )
             )
-                ?: throw CommandException(SubCommandNotFoundError(ctx.message, ctx.command, null))
+                ?: throw CommandException(SubCommandNotFoundError(ctx.message, ctx.command, ctx.args.getOrNull(0)))
         }
         val command = commandMap[ctx.args[0]]!!
         CommandHandler.verify(ctx.message, command, ctx.client) // Lets the command handler verify the integrity.
