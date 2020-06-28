@@ -81,7 +81,7 @@ class CommandGroup(
             CommandContext(
                 ctx.message,
                 command,
-                ctx.args.slice(1..ctx.args.size).toTypedArray(),
+                ctx.args.drop(1).toTypedArray(),
                 ctx.prefix,
                 ctx.client
             )
