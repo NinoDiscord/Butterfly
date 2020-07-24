@@ -47,7 +47,7 @@ class CommandContext(
     /**
      * The guild the message was sent in, will be null if the message was not sent in a guild
      */
-    val guild: Guild? = if (message.channelType == ChannelType.TEXT) message.guild else null
+    val guild: Guild? = if (message.isFromGuild) message.guild else null
 
     /**
      * The channel the message was sent in
@@ -136,7 +136,7 @@ class CommandContext(
         args: Map<String, String> = mapOf(),
         language: I18nLanguage? = null
     ): Mono<Message> {
-        return mono { replyTranslate(key, args) }
+        return mono { replyTranslate(key, args, language) }
     }
 
     /**

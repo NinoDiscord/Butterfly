@@ -11,12 +11,12 @@ plugins {
     id("org.jetbrains.dokka") version "0.10.1"
     id("com.jfrog.bintray") version "1.8.5"
     `maven-publish`
-    id("com.github.johnrengelman.shadow") version "5.1.0"
+    id("com.github.johnrengelman.shadow") version "5.2.0"
 }
 
 val artifact = "Butterfly"
 group = "dev.augu.nino"
-version = "0.1.1"
+version = "0.2.0"
 
 
 repositories {

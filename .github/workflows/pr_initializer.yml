@@ -1,0 +1,22 @@
+# This is a workflow that initializes PRs to the master branch
+
+name: CI
+
+on:
+  pull_request:
+    types: [ created ]
+    branches: [ master ]
+
+jobs:
+  add_reviewers:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Add Pull Request Reviewer
+      uses: AveryCameronUofR/add-reviewer-gh-action@1.0.1
+      with:
+        reviewers: dondish
+        token: ${{ secrets.GITHUB_TOKEN }}
+      

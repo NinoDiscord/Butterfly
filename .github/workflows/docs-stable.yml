@@ -1,12 +1,12 @@
-# This workflow will build a Java project with Gradle
-# For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-gradle
+# This is a basic workflow to help you get started with Actions
 
-name: Documentation CI
+name: Documentation Stable CI
 
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
 on:
   push:
-    branches: [ master ]
-
+    branches: [ stable ]
 jobs:
   build:
 
@@ -30,7 +30,7 @@ jobs:
     - name: Create Documentation
       run: ./gradlew dokka
     - run: |
-        mv build/dokka/-butterfly build/dokka/butterfly
+        mv build/dokka/-butterfly build/dokka/butterfly-stable
         chmod -R +777 build/dokka
     - name: Push to docs server
       uses: appleboy/scp-action@master
@@ -39,7 +39,7 @@ jobs:
         port: 22
         username: ${{ secrets.REMOTE_USER }}
         password: ${{ secrets.REMOTE_PASS }}
-        source: "build/dokka/butterfly,build/dokka/style.css"
+        source: "build/dokka/butterfly-stable,build/dokka/style.css"
         target: "/var/www/docs.augu.dev/dist"
         overwrite: true
         strip_components: 2
@@ -53,3 +53,4 @@ jobs:
 #         password: ${{ secrets.REMOTE_PASS }}
 #         script: |
 #           cp ~/kotlin-docs/* /var/www/docs.augu.dev/dist
+

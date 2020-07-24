@@ -54,3 +54,17 @@ data class InsufficientBotPermissionsError(
     val requiredPermissions: Long,
     val actualPermissions: Long
 ) : CommandError(message, command, "Bot has insufficient permissions.")
+
+/**
+ * An error thrown when a user invokes a command group, with an incorrect subcommand, and there is no default command.
+ *
+ * @since 0.2.0
+ * @property message the message that caused the error
+ * @property command the command group that had the error
+ * @property subCommandName the subcommand name if any
+ */
+data class SubCommandNotFoundError(
+    override val message: Message,
+    override val command: Command,
+    val subCommandName: String?
+) : CommandError(message, command, "Subcommand not found.")
