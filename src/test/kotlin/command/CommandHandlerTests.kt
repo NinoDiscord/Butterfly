@@ -1,5 +1,6 @@
 package command
 
+import club.minnced.jda.reactor.ReactiveEventManager
 import dev.augu.nino.butterfly.ButterflyClient
 import dev.augu.nino.butterfly.GuildSettings
 import dev.augu.nino.butterfly.GuildSettingsLoader
@@ -13,7 +14,9 @@ import io.kotest.assertions.throwables.shouldThrowMessage
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.ObsoleteCoroutinesApi
+import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.*
@@ -21,9 +24,9 @@ import net.dv8tion.jda.api.entities.*
 @ExperimentalCoroutinesApi
 @ObsoleteCoroutinesApi
 class CommandHandlerTests : DescribeSpec({
-    val coroutinescope = CoroutineScope(newSingleThreadContext("Command Thread"))
     val jda = mockk<JDA>(relaxed = true)
-    val client = spyk(ButterflyClient(jda, arrayOf("239790360728043520"), scope = coroutinescope))
+    every { jda.eventManager } returns ReactiveEventManager()
+    val client = spyk(ButterflyClient(jda, arrayOf("239790360728043520")))
     val handler = CommandHandler(client)
     val message = mockk<Message>(relaxed = true)
     val command = spyk<Command>(object : Command(
