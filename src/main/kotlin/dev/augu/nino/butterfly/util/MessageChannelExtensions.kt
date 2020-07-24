@@ -57,4 +57,5 @@ suspend fun MessageChannel.waitForMessage(
 fun MessageChannel.waitForMessages(predicate: (Message) -> Boolean = { it.channel == this }): Flux<Message> {
     return jda.on<MessageReceivedEvent>()
         .map { it.message }
+        .filter(predicate)
 }
