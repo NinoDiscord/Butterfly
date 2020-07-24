@@ -23,7 +23,7 @@ import net.dv8tion.jda.api.entities.*
 class CommandHandlerTests : DescribeSpec({
     val coroutinescope = CoroutineScope(newSingleThreadContext("Command Thread"))
     val jda = mockk<JDA>(relaxed = true)
-    val client = spyk(ButterflyClient(jda, "239790360728043520", scope = coroutinescope))
+    val client = spyk(ButterflyClient(jda, arrayOf("239790360728043520"), scope = coroutinescope))
     val handler = CommandHandler(client)
     val message = mockk<Message>(relaxed = true)
     val command = spyk<Command>(object : Command(

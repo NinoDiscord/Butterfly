@@ -27,7 +27,7 @@ class CommandHandler(private val client: ButterflyClient) {
                 throw CommandException(NotInGuildError(message, command))
             }
 
-            if (command.ownerOnly && message.author.id != client.ownerId) {
+            if (command.ownerOnly && client.ownerIds.all { message.author.id != it }) {
                 throw CommandException(NotOwnerError(message, command))
             }
 

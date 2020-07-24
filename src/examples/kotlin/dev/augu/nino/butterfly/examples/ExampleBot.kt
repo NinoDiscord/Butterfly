@@ -10,7 +10,7 @@ object ExampleBot {
         val jda = JDABuilder
             .createDefault(System.getenv("TOKEN"))
             .build()
-        val client = ButterflyClient.builder(jda, "239790360728043520").build()
+        val client = ButterflyClient.builder(jda, arrayOf("239790360728043520")).build()
         client.addPrefix("test!")
         client.addCommand(EchoCommand(), PingCommand())
     }

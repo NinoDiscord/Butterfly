@@ -136,7 +136,7 @@ class CommandContext(
         args: Map<String, String> = mapOf(),
         language: I18nLanguage? = null
     ): Mono<Message> {
-        return mono { replyTranslate(key, args) }
+        return mono { replyTranslate(key, args, language) }
     }
 
     /**
