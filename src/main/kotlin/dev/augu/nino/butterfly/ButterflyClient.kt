@@ -23,7 +23,7 @@ import org.slf4j.LoggerFactory
  * ## Example:
  * @sample dev.augu.nino.butterfly.examples.ExampleBot
  * @property jda the JDA instance
- * @property ownerId the owner's id, necessary for the command system to function
+ * @property ownerIds the owners' id, necessary for the command system to function
  * @param invokeOnMessageEdit whether to invoke on message edit or not
  * @param useDefaultHelpCommand whether to use the default help command or not
  * @property defaultLanguage the default language to use
@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory
  */
 class ButterflyClient(
     val jda: JDA,
-    val ownerId: String,
+    val ownerIds: Array<String>,
     invokeOnMessageEdit: Boolean = false,
     useDefaultHelpCommand: Boolean = true,
     val defaultLanguage: I18nLanguage? = null,
@@ -203,11 +203,11 @@ class ButterflyClient(
          * Creates a new [Builder]
          *
          * @param jda the [JDA] instance
-         * @param ownerId the owner's id
+         * @param ownerIds the owners' id
          * @return a new [Builder]
          */
-        fun builder(jda: JDA, ownerId: String): Builder {
-            return Builder(jda, ownerId)
+        fun builder(jda: JDA, ownerIds: Array<String>): Builder {
+            return Builder(jda, ownerIds)
         }
 
         /**
@@ -215,9 +215,9 @@ class ButterflyClient(
          *
          * This class adds Java interoperability.
          * @property jda the [JDA] instance
-         * @property ownerId the owner's id
+         * @property ownerIds the owners' id
          */
-        class Builder internal constructor(var jda: JDA, var ownerId: String) {
+        class Builder internal constructor(var jda: JDA, var ownerIds: Array<String>) {
             /**
              * Whether to invoke on message edit or not
              */
@@ -252,7 +252,7 @@ class ButterflyClient(
              */
             fun build(): ButterflyClient = ButterflyClient(
                 jda,
-                ownerId,
+                ownerIds,
                 invokeOnMessageEdit,
                 useDefaultHelpCommand,
                 defaultLanguage,
