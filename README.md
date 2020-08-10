@@ -5,7 +5,7 @@
 ### Documentation
 Master: [https://docs.augu.dev/butterfly](https://docs.augu.dev/butterfly)
 
-Stable: Soon
+Stable: [https://docs.augu.dev/butterfly-stable](https://docs.augu.dev/butterfly-stable)
 ### Adding as dependency:
 Fetch the version from the badge.
 #### Add dependency using Gradle
