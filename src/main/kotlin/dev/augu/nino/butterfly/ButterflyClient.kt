@@ -99,7 +99,6 @@ class ButterflyClient(
     }
 
     init {
-        println(jda.eventManager)
         jda.on<MessageReceivedEvent>().subscribe {
             invokeAndCatch(it.message).subscribe()
         }
