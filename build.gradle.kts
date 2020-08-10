@@ -22,6 +22,7 @@ version = "0.2.0"
 repositories {
     mavenCentral()
     jcenter()
+    maven("https://dl.bintray.com/kotlin/kotlin-eap")
 }
 
 dependencies {
