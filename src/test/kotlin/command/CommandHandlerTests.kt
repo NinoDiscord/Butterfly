@@ -26,7 +26,7 @@ import net.dv8tion.jda.api.entities.*
 class CommandHandlerTests : DescribeSpec({
     val jda = mockk<JDA>(relaxed = true)
     every { jda.eventManager } returns ReactiveEventManager()
-    val client = spyk(ButterflyClient(jda, arrayOf("239790360728043520")))
+    val client = spyk(ButterflyClient(jda, arrayOf("239790360728043520"), useDefaultHelpCommand = false))
     val handler = CommandHandler(client)
     val message = mockk<Message>(relaxed = true)
     val command = spyk<Command>(object : Command(

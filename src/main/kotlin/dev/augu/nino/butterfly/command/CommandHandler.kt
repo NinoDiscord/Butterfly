@@ -2,13 +2,14 @@ package dev.augu.nino.butterfly.command
 
 import dev.augu.nino.butterfly.ButterflyClient
 import dev.augu.nino.butterfly.GuildSettings
+import dev.augu.nino.butterfly.IButterflyClient
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Message
 
 /**
  * The command handler.
  *
- * This class is built in the [ButterflyClient].
+ * This class is built in the [IButterflyClient].
  */
 class CommandHandler(private val client: ButterflyClient) {
 
@@ -19,7 +20,7 @@ class CommandHandler(private val client: ButterflyClient) {
          * @since 0.2.0
          * @param message the message sent
          * @param command the command to run
-         * @param client the [ButterflyClient] instance
+         * @param client The [ButterflyClient] instance
          */
         fun verify(message: Message, command: Command, client: ButterflyClient) {
 

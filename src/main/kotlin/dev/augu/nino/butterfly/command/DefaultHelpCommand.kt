@@ -32,8 +32,8 @@ class DefaultHelpCommand : Command(
         if (ctx.args.isEmpty()) {
             val embed = EmbedBuilder().let { builder ->
                 builder.setTitle(
-                    ctx.language()?.translate("helpCommandTitle", mapOf("botName" to client.selfUser.name))
-                        ?: "Help - ${client.selfUser.name}"
+                    ctx.language()?.translate("helpCommandTitle", mapOf("botName" to client.jda.selfUser.name))
+                        ?: "Help - ${client.jda.selfUser.name}"
                 )
                 builder.setDescription(
                     ctx.language()?.translate("helpCommandDescription", mapOf("prefix" to ctx.prefix))
