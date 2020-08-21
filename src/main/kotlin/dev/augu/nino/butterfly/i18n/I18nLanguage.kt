@@ -9,9 +9,10 @@ package dev.augu.nino.butterfly.i18n
  *
  * ## Example
  * @sample dev.augu.nino.butterfly.examples.LanguageBot
+ * @property name The name of the language
  * @property translationTable the translation table to fetch format keys from
  */
-open class I18nLanguage(private val translationTable: Map<String, String>) {
+open class I18nLanguage(val name: String, private val translationTable: Map<String, String>) {
     companion object {
         /**
          * Matches ${key}.

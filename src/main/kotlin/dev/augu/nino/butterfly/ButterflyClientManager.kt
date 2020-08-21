@@ -1,133 +1,131 @@
 package dev.augu.nino.butterfly
 
 import club.minnced.jda.reactor.on
-import dev.augu.nino.butterfly.command.*
+import dev.augu.nino.butterfly.command.Command
+import dev.augu.nino.butterfly.command.CommandErrorHandler
 import dev.augu.nino.butterfly.i18n.I18nLanguage
-import kotlinx.coroutines.reactor.mono
-import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Message
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent
-import net.dv8tion.jda.api.events.message.MessageUpdateEvent
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
-import reactor.core.publisher.Mono
-
+import net.dv8tion.jda.api.events.ReadyEvent
+import net.dv8tion.jda.api.sharding.ShardManager
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentMap
 
 /**
- * The Butterfly client
+ * The Butterfly client manager
  *
- * This class wraps the normal JDA client and allows access to all of Butterfly's subprojects at ease.
+ * This helps with managing shards using [ButterflyClient]s.
+ * This class has the same API as the normal [ButterflyClient], making this class control all [ButterflyClient]s below him.
+ *
  *
  * ## Example:
- * @sample dev.augu.nino.butterfly.examples.ExampleBot
- * @property jda the JDA instance
+ * @sample dev.augu.nino.butterfly.examples.ShardedExampleBot
+ * @property shardManager the [ShardManager] instance
  * @property ownerIds the owners' id, necessary for the command system to function
  * @param invokeOnMessageEdit whether to invoke on message edit or not
  * @param useDefaultHelpCommand whether to use the default help command or not
  * @property defaultLanguage the default language to use
  * @property guildSettingsLoader a [GuildSettings] loader
  */
-class ButterflyClient(
-    val jda: JDA,
+class ButterflyClientManager(
+    val shardManager: ShardManager,
     override val ownerIds: Array<String>,
-    invokeOnMessageEdit: Boolean = false,
-    useDefaultHelpCommand: Boolean = true,
-    override val defaultLanguage: I18nLanguage? = null,
-    override val guildSettingsLoader: GuildSettingsLoader<*> = object :
-        GuildSettingsLoader<GuildSettings> {
-        override suspend fun load(guild: Guild): GuildSettings = GuildSettings(null, null)
-    }
+    private val invokeOnMessageEdit: Boolean,
+    private val useDefaultHelpCommand: Boolean,
+    override val defaultLanguage: I18nLanguage?,
+    override val guildSettingsLoader: GuildSettingsLoader<*>
 ) : IButterflyClient {
+    private val butterflyClients: ConcurrentMap<Int, ButterflyClient> = ConcurrentHashMap()
 
-    private val logger: Logger = LoggerFactory.getLogger(this::class.java)
+    override val commands: MutableMap<String, Command> = mutableMapOf()
 
-    private val handler: CommandHandler = CommandHandler(this)
+    override val aliases: MutableMap<String, Command> = mutableMapOf()
 
-    /**
-     * Invokes the [CommandHandler] and catches errors
-     */
-    private fun invokeAndCatch(msg: Message): Mono<Unit> = mono {
-        try {
-            handler.invoke(msg)
-        } catch (c: CommandException) { // CommandExceptions can be handled by the user.
-            for (errorHandler in commandErrorHandlers) {
-                errorHandler.invoke(c.error)
-            }
-            if (commandErrorHandlers.isEmpty()) {
-                logger.error("CommandClient: Uncaught error during execution of command: ${c.localizedMessage}")
-            }
-        } catch (e: Exception) { // Makes sure not to crash on any command error
-            logger.error("CommandClient: Uncaught error during execution of command: ${e.localizedMessage}")
-        }
-    }
+    override val languages: MutableMap<String, I18nLanguage> = mutableMapOf()
 
-    override val commands: MutableMap<String, Command> = HashMap()
+    override val prefixes: MutableList<String> = mutableListOf()
 
+    override val prefixLoaders: MutableList<suspend (Message) -> String?> = mutableListOf()
 
-    override val aliases: MutableMap<String, Command> = HashMap()
-
-
-    override val languages: MutableMap<String, I18nLanguage> = HashMap()
-
-
-    override val prefixes: MutableList<String> = ArrayList()
-
-
-    override val prefixLoaders: MutableList<suspend (Message) -> String?> = ArrayList()
-
-
-    override val commandErrorHandlers: MutableList<CommandErrorHandler> = ArrayList()
+    override val commandErrorHandlers: MutableList<CommandErrorHandler> = mutableListOf()
 
     init {
-        jda.on<MessageReceivedEvent>().subscribe {
-            invokeAndCatch(it.message).subscribe()
-        }
-        if (invokeOnMessageEdit) {
-            jda.on<MessageUpdateEvent>().subscribe {
-                invokeAndCatch(it.message).subscribe()
-            }
-        }
+        shardManager.on<ReadyEvent>().subscribe { readyEvent: ReadyEvent ->
+            val jda = readyEvent.jda
+            val shardInfo = jda.shardInfo
 
-        if (useDefaultHelpCommand) {
-            addCommand(DefaultHelpCommand())
+            if (shardInfo.shardId !in butterflyClients) {
+                butterflyClients[shardInfo.shardId] = ButterflyClient.builder(jda, ownerIds)
+                    .let {
+                        it.defaultLanguage = defaultLanguage
+                        it.invokeOnMessageEdit = invokeOnMessageEdit
+                        it.useDefaultHelpCommand = useDefaultHelpCommand
+                        it.guildSettingsLoader = guildSettingsLoader
+                        it
+                    }
+                    .addCommands(*commands.values.toTypedArray())
+                    .addLanguages(*languages.values.toTypedArray())
+                    .addPrefixes(*prefixes.toTypedArray())
+                    .addPrefixLoaders(*prefixLoaders.toTypedArray())
+                    .addCommandErrorHandlers(*commandErrorHandlers.toTypedArray())
+                    .build()
+            }
         }
     }
 
     override fun addCommand(command: Command, vararg commands: Command) {
-        this.commands[command.name] = command
+        addCommandInternal(command)
 
-        for (alias in command.aliases) {
-            aliases[alias] = command
+        commands.forEach(this::addCommandInternal)
+
+        for ((_, butterflyClient) in butterflyClients) {
+            butterflyClient.addCommand(command, *commands)
         }
+    }
 
-        commands.forEach { addCommand(it) }
+    private fun addCommandInternal(cmd: Command) {
+        commands[cmd.name] = cmd
+
+        for (alias in cmd.aliases) {
+            aliases[alias] = cmd
+        }
     }
 
     override fun addLanguage(language: I18nLanguage, vararg languages: I18nLanguage) {
-        this.languages[language.name] = language
+        addLanguageInternal(language)
 
-        languages.forEach { addLanguage(it) }
+        languages.forEach(this::addLanguageInternal)
+
+        for ((_, butterflyClient) in butterflyClients) {
+            butterflyClient.addLanguage(language, *languages)
+        }
+    }
+
+    private fun addLanguageInternal(language: I18nLanguage) {
+        languages[language.name] = language
     }
 
     override fun addPrefix(prefix: String, vararg prefixes: String) {
         this.prefixes.add(prefix)
-        for (prefx in prefixes) {
-            this.prefixes.add(prefx)
+        this.prefixes.addAll(prefixes)
+
+        for ((_, butterflyClient) in butterflyClients) {
+            butterflyClient.addPrefix(prefix, *prefixes)
         }
     }
 
     override fun addPrefixLoader(loader: suspend (Message) -> String?, vararg loaders: suspend (Message) -> String?) {
-        prefixLoaders.add(loader)
-        for (gtr in loaders) {
-            prefixLoaders.add(gtr)
+        this.prefixLoaders.add(loader)
+        this.prefixLoaders.addAll(loaders)
+
+        for ((_, butterflyClient) in butterflyClients) {
+            butterflyClient.addPrefixLoader(loader, *loaders)
         }
     }
 
     override fun addErrorHandler(handler: CommandErrorHandler, vararg handlers: CommandErrorHandler) {
-        commandErrorHandlers.add(handler)
-        for (hndlr in handlers) {
-            commandErrorHandlers.add(hndlr)
+        for ((_, butterflyClient) in butterflyClients) {
+            butterflyClient.addErrorHandler(handler, *handlers)
         }
     }
 
@@ -135,22 +133,22 @@ class ButterflyClient(
         /**
          * Creates a new [Builder]
          *
-         * @param jda the [JDA] instance
+         * @param shardManager the [ShardManager] instance
          * @param ownerIds the owners' id
          * @return a new [Builder]
          */
-        fun builder(jda: JDA, ownerIds: Array<String>): Builder {
-            return Builder(jda, ownerIds)
+        fun builder(shardManager: ShardManager, ownerIds: Array<String>): Builder {
+            return Builder(shardManager, ownerIds)
         }
 
         /**
-         * Builds a [ButterflyClient]
+         * Builds a [ButterflyClientManager]
          *
          * This class adds Java interoperability.
-         * @property jda the [JDA] instance
+         * @property shardManager the [ShardManager] instance
          * @property ownerIds the owners' id
          */
-        class Builder internal constructor(var jda: JDA, var ownerIds: Array<String>) {
+        class Builder internal constructor(var shardManager: ShardManager, var ownerIds: Array<String>) {
             /**
              * Whether to invoke on message edit or not
              */
@@ -255,12 +253,12 @@ class ButterflyClient(
             }
 
             /**
-             * Builds the [ButterflyClient]
-             * @return the [ButterflyClient] instance
+             * Builds the [ButterflyClientManager]
+             * @return the [ButterflyClientManager] instance
              */
-            fun build(): ButterflyClient {
-                val client = ButterflyClient(
-                    jda,
+            fun build(): ButterflyClientManager {
+                val client = ButterflyClientManager(
+                    shardManager,
                     ownerIds,
                     invokeOnMessageEdit,
                     useDefaultHelpCommand,
@@ -290,4 +288,5 @@ class ButterflyClient(
 
         }
     }
+
 }

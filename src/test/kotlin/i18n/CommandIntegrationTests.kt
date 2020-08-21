@@ -15,6 +15,7 @@ class CommandIntegrationTests : DescribeSpec({
         val command = spyk(DefaultHelpCommand())
         val hebrew = spyk(
             I18nLanguage(
+                "hebrew",
                 mapOf(
                     "helpCommandTitle" to "עזרה - \${botName}",
                     "helpCommandDescription" to "בכדי לקבל עזרה בפקודה מסוימת, תעשה \${prefix}help <פקודה>",
@@ -41,7 +42,7 @@ class CommandIntegrationTests : DescribeSpec({
             every { ctx.client.commands } returns commands
             every { ctx.args } returns arrayOf()
             every { ctx.prefix } returns "!"
-            every { ctx.client.selfUser.name } returns "Test"
+            every { ctx.client.jda.selfUser.name } returns "Test"
             coEvery { ctx.language() } returns hebrew
 
             shouldNotThrow<Exception> {
@@ -71,7 +72,7 @@ class CommandIntegrationTests : DescribeSpec({
             val ctx = mockk<CommandContext>(relaxed = true)
             every { ctx.client.commands } returns commands
             every { ctx.args } returns arrayOf("visible")
-            every { ctx.client.selfUser.name } returns "Test"
+            every { ctx.client.jda.selfUser.name } returns "Test"
             coEvery { ctx.language() } returns hebrew
 
             shouldNotThrow<Exception> {
@@ -101,7 +102,7 @@ class CommandIntegrationTests : DescribeSpec({
             every { ctx.client.commands } returns commands
             every { ctx.client.aliases } returns mutableMapOf()
             every { ctx.args } returns arrayOf("errorous")
-            every { ctx.client.selfUser.name } returns "Test"
+            every { ctx.client.jda.selfUser.name } returns "Test"
             coEvery { ctx.language() } returns hebrew
 
             shouldNotThrow<Exception> {

@@ -25,7 +25,7 @@ class CommandIntegrationTests : DescribeSpec({
             override suspend fun execute(ctx: CommandContext) {
                 val msg = ctx.reply("Calculating...")
                 val ping = ctx.message.timeCreated.until(msg.timeCreated, ChronoUnit.MILLIS)
-                msg.edit("Ping: ${ping}ms | Websocket: ${ctx.client.gatewayPing}ms")
+                msg.edit("Ping: ${ping}ms | Websocket: ${ctx.client.jda.gatewayPing}ms")
             }
         }
 
@@ -47,7 +47,7 @@ class CommandIntegrationTests : DescribeSpec({
             val msg = mockk<Message>(relaxed = true)
             val time = OffsetDateTime.now()
 
-            every { ctx.client.gatewayPing } returns 5
+            every { ctx.client.jda.gatewayPing } returns 5
             every { ctx.message.timeCreated } returns time
             coEvery { ctx.language() } returns null
             every { msg.timeCreated } returns time + Duration.of(5, ChronoUnit.SECONDS)
@@ -88,7 +88,7 @@ class CommandIntegrationTests : DescribeSpec({
             every { ctx.client.commands } returns commands
             every { ctx.args } returns arrayOf()
             coEvery { ctx.language() } returns null
-            every { ctx.client.selfUser.name } returns "Test"
+            every { ctx.client.jda.selfUser.name } returns "Test"
 
             shouldNotThrow<Exception> {
                 runBlocking {
@@ -117,7 +117,7 @@ class CommandIntegrationTests : DescribeSpec({
             every { ctx.client.commands } returns commands
             every { ctx.args } returns arrayOf("visible")
             coEvery { ctx.language() } returns null
-            every { ctx.client.selfUser.name } returns "Test"
+            every { ctx.client.jda.selfUser.name } returns "Test"
 
             shouldNotThrow<Exception> {
                 runBlocking {
@@ -147,7 +147,7 @@ class CommandIntegrationTests : DescribeSpec({
             every { ctx.client.aliases } returns mutableMapOf()
             every { ctx.args } returns arrayOf("errorous")
             coEvery { ctx.language() } returns null
-            every { ctx.client.selfUser.name } returns "Test"
+            every { ctx.client.jda.selfUser.name } returns "Test"
 
             shouldNotThrow<Exception> {
                 runBlocking {

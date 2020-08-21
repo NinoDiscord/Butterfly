@@ -17,7 +17,7 @@ import net.dv8tion.jda.api.entities.Guild
  * @property prefix the guild prefix
  * @property counter counts the number of command calls for each guild.
  */
-class CustomSettings(override var prefix: String?, var counter: Int) : GuildSettings(prefix, null) {
+private class CustomSettings(override var prefix: String?, var counter: Int) : GuildSettings(prefix, null) {
     suspend fun save() {
         // Save to a database
     }
@@ -26,7 +26,7 @@ class CustomSettings(override var prefix: String?, var counter: Int) : GuildSett
 /**
  * Custom settings loader
  */
-object CustomSettingsLoader : GuildSettingsLoader<CustomSettings> {
+private object CustomSettingsLoader : GuildSettingsLoader<CustomSettings> {
     val map = mutableMapOf<String, CustomSettings>()
 
     override suspend fun load(guild: Guild): CustomSettings =
@@ -34,41 +34,41 @@ object CustomSettingsLoader : GuildSettingsLoader<CustomSettings> {
 
 }
 
-class AddCommand : Command("add", "simple", "++", guildOnly = true) {
+private class AddCommand : Command("add", "simple", "++", guildOnly = true) {
     override suspend fun execute(ctx: CommandContext) {
         ctx.settings<CustomSettings>()!!.counter++
     }
 }
 
-class PrintCommand : Command("print", "simple", "printcount", "value", guildOnly = true) {
+private class PrintCommand : Command("print", "simple", "printcount", "value", guildOnly = true) {
     override suspend fun execute(ctx: CommandContext) {
         ctx.reply("The value is: ${ctx.settings<CustomSettings>()!!.counter}")
     }
 }
 
-class ClearCommand : Command("clear", "simple", guildOnly = true) {
+private class ClearCommand : Command("clear", "simple", guildOnly = true) {
     override suspend fun execute(ctx: CommandContext) {
         ctx.settings<CustomSettings>()!!.counter = 0
     }
 }
 
-object SettingsOverload {
+private object SettingsOverload {
     fun launch() {
         val jda = JDABuilder
             .createDefault(System.getenv("TOKEN"))
             .setEventManager(ReactiveEventManager())
             .build()
-        val client = ButterflyClient.builder(jda, arrayOf("239790360728043520")).let {
-            it.guildSettingsLoader = CustomSettingsLoader
-            it.build()
-        }
-        client.addPrefix("test!")
-        client.addCommand(AddCommand())
-        client.addCommand(PrintCommand())
-        client.addCommand(ClearCommand())
+        val client = ButterflyClient.builder(jda, arrayOf("239790360728043520"))
+            .let {
+                it.guildSettingsLoader = CustomSettingsLoader
+                it
+            }
+            .addCommands(AddCommand(), PrintCommand(), ClearCommand())
+            .addPrefixes("test!")
+            .build()
     }
 }
 
-fun main() {
+private fun main() {
     SettingsOverload.launch()
 }

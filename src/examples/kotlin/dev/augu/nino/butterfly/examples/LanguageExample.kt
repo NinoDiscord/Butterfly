@@ -16,7 +16,7 @@ import net.dv8tion.jda.api.entities.Guild
 /**
  * Custom settings loader
  */
-class CustomLanguageSettingsLoader(val defaultLanguage: I18nLanguage) : GuildSettingsLoader<GuildSettings> {
+private class CustomLanguageSettingsLoader(val defaultLanguage: I18nLanguage) : GuildSettingsLoader<GuildSettings> {
     val map = mutableMapOf<String, GuildSettings>()
 
     override suspend fun load(guild: Guild): GuildSettings =
@@ -27,7 +27,7 @@ class CustomLanguageSettingsLoader(val defaultLanguage: I18nLanguage) : GuildSet
 /**
  * Example
  */
-class ExampleCommand : Command("example", "generic", "דוגמא", "пример", guildOnly = true) {
+private class ExampleCommand : Command("example", "generic", "דוגמא", "пример", guildOnly = true) {
     override suspend fun execute(ctx: CommandContext) {
         ctx.replyTranslate("example")
     }
@@ -36,7 +36,7 @@ class ExampleCommand : Command("example", "generic", "דוגמא", "пример
 /**
  * Greets someone
  */
-class GreetCommand : Command("greet", "generic", "ברך", "приветствуйте", guildOnly = true) {
+private class GreetCommand : Command("greet", "generic", "ברך", "приветствуйте", guildOnly = true) {
     override suspend fun execute(ctx: CommandContext) {
         if (ctx.args.isEmpty()) {
             ctx.replyTranslate("greetError")
@@ -49,7 +49,7 @@ class GreetCommand : Command("greet", "generic", "ברך", "приветству
 /**
  * Changes the language
  */
-class ChangeCommand : Command("change", "generic", "שנה", "изменение", guildOnly = true) {
+private class ChangeCommand : Command("change", "generic", "שנה", "изменение", guildOnly = true) {
     override suspend fun execute(ctx: CommandContext) {
         if (ctx.args.isEmpty()) {
             ctx.replyTranslate("changeNotProvided")
@@ -65,9 +65,10 @@ class ChangeCommand : Command("change", "generic", "שנה", "изменение
     }
 }
 
-object LanguageBot {
+private object LanguageBot {
     fun launch() {
         val english = I18nLanguage(
+            "english",
             mapOf(
                 "example" to "This is an example",
                 "greet" to "Hello \${name}!",
@@ -78,6 +79,7 @@ object LanguageBot {
             )
         )
         val hebrew = I18nLanguage(
+            "עברית",
             mapOf(
                 "example" to "זאת דוגמא",
                 "greet" to "שלום \${name}!",
@@ -88,6 +90,7 @@ object LanguageBot {
             )
         )
         val russian = I18nLanguage(
+            "русский",
             mapOf(
                 "example" to "это пример",
                 "greet" to "привет \${name}!",
@@ -101,19 +104,19 @@ object LanguageBot {
             .createDefault(System.getenv("TOKEN"))
             .setEventManager(ReactiveEventManager())
             .build()
-        val client = ButterflyClient.builder(jda, arrayOf("239790360728043520")).let {
-            it.useDefaultHelpCommand = false
-            it.guildSettingsLoader = CustomLanguageSettingsLoader(english)
-            it
-        }.build()
-        client.addPrefix("test!")
-        client.addLanguage("english", english)
-        client.addLanguage("עברית", hebrew)
-        client.addLanguage("русский", russian)
-        client.addCommand(ExampleCommand(), GreetCommand(), ChangeCommand())
+        val client = ButterflyClient.builder(jda, arrayOf("239790360728043520"))
+            .let {
+                it.useDefaultHelpCommand = false
+                it.guildSettingsLoader = CustomLanguageSettingsLoader(english)
+                it
+            }
+            .addCommands(ExampleCommand(), GreetCommand(), ChangeCommand())
+            .addLanguages(english, hebrew, russian)
+            .addPrefixes("test!")
+            .build()
     }
 }
 
-fun main() {
+private fun main() {
     LanguageBot.launch()
 }

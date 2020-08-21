@@ -57,7 +57,7 @@ class CommandContext(
     /**
      * This bot as a [SelfUser]
      */
-    val me: SelfUser = client.selfUser
+    val me: SelfUser = client.jda.selfUser
 
     /**
      * This bot as a [Member]
