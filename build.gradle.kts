@@ -76,6 +76,7 @@ tasks {
     compileTestKotlin {
         kotlinOptions.jvmTarget = "1.8"
     }
+
     dokka {
         outputFormat = "html"
         outputDirectory = "$buildDir/dokka"

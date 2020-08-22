@@ -57,8 +57,6 @@ class ButterflyClient(
             if (commandErrorHandlers.isEmpty()) {
                 logger.error("CommandClient: Uncaught error during execution of command: ${c.localizedMessage}")
             }
-        } catch (e: Exception) { // Makes sure not to crash on any command error
-            logger.error("CommandClient: Uncaught error during execution of command: ${e.localizedMessage}")
         }
     }
 
