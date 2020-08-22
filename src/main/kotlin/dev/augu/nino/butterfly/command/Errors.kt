@@ -68,3 +68,15 @@ data class SubCommandNotFoundError(
     override val command: Command,
     val subCommandName: String?
 ) : CommandError(message, command, "Subcommand not found.")
+
+/**
+ * An error thrown when the bot wants to use an embed, without the needed permissions.
+ *
+ * @since 0.3
+ * @property message the message that caused the error
+ * @property command the command that had the error
+ */
+data class MissingEmbedPermissionsError(
+    override val message: Message,
+    override val command: Command
+) : CommandError(message, command, "Missing permissions to embed message.")
