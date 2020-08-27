@@ -5,6 +5,7 @@ import dev.augu.nino.butterfly.GuildSettings
 import dev.augu.nino.butterfly.IButterflyClient
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Message
+import net.dv8tion.jda.api.events.message.GenericMessageEvent
 
 /**
  * The command handler.
@@ -68,16 +69,16 @@ class CommandHandler(private val client: ButterflyClient) {
      * This method is called on any message received.
      *
      * @param message the message received
+     * @param event the event that caused the invoke
      */
-    suspend fun invoke(message: Message) {
+    suspend fun invoke(message: Message, event: GenericMessageEvent) {
         if (message.author.isBot) return
 
         var content = message.contentRaw
-        val settings: GuildSettings?
-        if (message.isFromGuild) {
-            settings = client.guildSettingsLoader.load(message.guild)
+        val settings: GuildSettings? = if (message.isFromGuild) {
+            client.guildSettingsLoader.load(message.guild)
         } else {
-            settings = null
+            null
         }
 
         val prefixes =
@@ -95,7 +96,14 @@ class CommandHandler(private val client: ButterflyClient) {
         verify(message, command, client)
 
         val ctx =
-            CommandContext(message, command, content.split(" ").filterNot { it == "" }.toTypedArray(), prefix, client)
+            CommandContext(
+                message,
+                command,
+                content.split(" ").filterNot { it == "" }.toTypedArray(),
+                prefix,
+                client,
+                event
+            )
 
         command.execute(ctx)
     }

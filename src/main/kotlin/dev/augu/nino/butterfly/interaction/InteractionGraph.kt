@@ -2,6 +2,8 @@ package dev.augu.nino.butterfly.interaction
 
 /**
  * An interface defining a graph of [GraphableInteractionStep].
+ *
+ * @since 0.3
  */
 interface InteractionGraph {
     /**

@@ -7,6 +7,7 @@ import kotlinx.coroutines.reactor.mono
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.entities.Message
+import net.dv8tion.jda.api.events.message.GenericMessageEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent
 import org.slf4j.Logger
@@ -47,9 +48,9 @@ class ButterflyClient(
     /**
      * Invokes the [CommandHandler] and catches errors
      */
-    private fun invokeAndCatch(msg: Message): Mono<Unit> = mono {
+    private fun invokeAndCatch(msg: Message, event: GenericMessageEvent): Mono<Unit> = mono {
         try {
-            handler.invoke(msg)
+            handler.invoke(msg, event)
         } catch (c: CommandException) { // CommandExceptions can be handled by the user.
             for (errorHandler in commandErrorHandlers) {
                 errorHandler.invoke(c.error)
@@ -79,11 +80,11 @@ class ButterflyClient(
 
     init {
         jda.on<MessageReceivedEvent>().subscribe {
-            invokeAndCatch(it.message).subscribe()
+            invokeAndCatch(it.message, it).subscribe()
         }
         if (invokeOnMessageEdit) {
             jda.on<MessageUpdateEvent>().subscribe {
-                invokeAndCatch(it.message).subscribe()
+                invokeAndCatch(it.message, it).subscribe()
             }
         }
 
@@ -135,10 +136,31 @@ class ButterflyClient(
          *
          * @param jda the [JDA] instance
          * @param ownerIds the owners' id
+         * @param invokeOnMessageEdit Whether to invoke on message edit or not
+         * @param useDefaultHelpCommand Whether to use the default help command or not.
+         * @param defaultLanguage The default language to use.
+         * @param guildSettingsLoader A [GuildSettings] loader, by default it loads an empty settings.
          * @return a new [Builder]
          */
-        fun builder(jda: JDA, ownerIds: Array<String>): Builder {
-            return Builder(jda, ownerIds)
+        fun builder(
+            jda: JDA,
+            ownerIds: Array<String>,
+            invokeOnMessageEdit: Boolean = false,
+            useDefaultHelpCommand: Boolean = true,
+            defaultLanguage: I18nLanguage? = null,
+            guildSettingsLoader: GuildSettingsLoader<*> = object :
+                GuildSettingsLoader<GuildSettings> {
+                override suspend fun load(guild: Guild): GuildSettings = GuildSettings(null, null)
+            }
+        ): Builder {
+            return Builder(
+                jda,
+                ownerIds,
+                invokeOnMessageEdit,
+                useDefaultHelpCommand,
+                defaultLanguage,
+                guildSettingsLoader
+            )
         }
 
         /**
@@ -147,30 +169,23 @@ class ButterflyClient(
          * This class adds Java interoperability.
          * @property jda the [JDA] instance
          * @property ownerIds the owners' id
+         * @property invokeOnMessageEdit Whether to invoke on message edit or not
+         * @property useDefaultHelpCommand Whether to use the default help command or not.
+         * @property defaultLanguage The default language to use.
+         * @property guildSettingsLoader A [GuildSettings] loader, by default it loads an empty settings.
          */
-        class Builder internal constructor(var jda: JDA, var ownerIds: Array<String>) {
-            /**
-             * Whether to invoke on message edit or not
-             */
-            var invokeOnMessageEdit: Boolean = false
-
-            /**
-             * Whether to use the default help command or not.
-             */
-            var useDefaultHelpCommand: Boolean = true
-
-            /**
-             * The default language to use.
-             */
-            var defaultLanguage: I18nLanguage? = null
-
-            /**
-             * A [GuildSettings] loader, by default it loads an empty settings.
-             */
+        class Builder internal constructor(
+            var jda: JDA,
+            var ownerIds: Array<String>,
+            var invokeOnMessageEdit: Boolean = false,
+            var useDefaultHelpCommand: Boolean = true,
+            var defaultLanguage: I18nLanguage? = null,
             var guildSettingsLoader: GuildSettingsLoader<*> = object :
                 GuildSettingsLoader<GuildSettings> {
                 override suspend fun load(guild: Guild): GuildSettings = GuildSettings(null, null)
             }
+        ) {
+
 
             private val commandList: MutableList<Command> = arrayListOf()
 

@@ -58,14 +58,11 @@ private object SettingsOverload {
             .createDefault(System.getenv("TOKEN"))
             .setEventManager(ReactiveEventManager())
             .build()
-        val client = ButterflyClient.builder(jda, arrayOf("239790360728043520"))
-            .let {
-                it.guildSettingsLoader = CustomSettingsLoader
-                it
-            }
-            .addCommands(AddCommand(), PrintCommand(), ClearCommand())
-            .addPrefixes("test!")
-            .build()
+        val client =
+            ButterflyClient.builder(jda, arrayOf("239790360728043520"), guildSettingsLoader = CustomSettingsLoader)
+                .addCommands(AddCommand(), PrintCommand(), ClearCommand())
+                .addPrefixes("test!")
+                .build()
     }
 }
 

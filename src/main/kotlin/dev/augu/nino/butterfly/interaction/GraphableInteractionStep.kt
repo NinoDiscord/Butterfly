@@ -4,8 +4,15 @@ package dev.augu.nino.butterfly.interaction
  * An [InteractionStep] that supports creation of graphs, allowing easier debugging and testability.
  *
  * @param name the name used for creating the graphs, must be unique in a graph.
+ * @since 0.3
  */
-class GraphableInteractionStep(val name: String) : InteractionStep() {
+open class GraphableInteractionStep(val name: String) : InteractionStep() {
+
+    /**
+     * Builds and returns the interaction step graph, it detects circles automatically.
+     *
+     * @return the interaction graph
+     */
     fun getGraph(): InteractionGraph {
         return getGraphRecursive(hashMapOf())
     }

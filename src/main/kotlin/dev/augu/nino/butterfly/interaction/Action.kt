@@ -15,7 +15,7 @@ interface Action {
      * @param event the event
      * @return a boolean of whether it can proceed to the next step
      */
-    fun shouldExecute(event: GenericEvent): Boolean
+    suspend fun shouldExecute(event: GenericEvent): Boolean
 
     /**
      * Returns the priority of the action, priority higher than other priorities will result on it being chosen.
