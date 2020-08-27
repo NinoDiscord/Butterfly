@@ -69,7 +69,8 @@ class CommandGroup(
                     defaultCommand,
                     ctx.args,
                     ctx.prefix,
-                    ctx.client
+                    ctx.client,
+                    ctx.event
                 )
             )
                 ?: throw CommandException(SubCommandNotFoundError(ctx.message, ctx.command, ctx.args.getOrNull(0)))
@@ -83,7 +84,8 @@ class CommandGroup(
                 command,
                 ctx.args.drop(1).toTypedArray(),
                 ctx.prefix,
-                ctx.client
+                ctx.client,
+                ctx.event
             )
         )
     }

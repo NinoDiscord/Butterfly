@@ -9,6 +9,7 @@ import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.reactor.mono
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.*
+import net.dv8tion.jda.api.events.message.GenericMessageEvent
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.Duration
@@ -23,14 +24,15 @@ import java.time.Duration
  * @property args The arguments passed
  * @property prefix The command prefix
  * @property client The [ButterflyClient] instance
- * @property settings The guild settings
+ * @property event The event that called this message
  */
 class CommandContext(
     val message: Message,
     val command: Command,
     val args: Array<String>,
     val prefix: String,
-    val client: ButterflyClient
+    val client: ButterflyClient,
+    val event: GenericMessageEvent
 ) {
 
     /**

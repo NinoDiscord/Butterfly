@@ -104,12 +104,12 @@ private object LanguageBot {
             .createDefault(System.getenv("TOKEN"))
             .setEventManager(ReactiveEventManager())
             .build()
-        val client = ButterflyClient.builder(jda, arrayOf("239790360728043520"))
-            .let {
-                it.useDefaultHelpCommand = false
-                it.guildSettingsLoader = CustomLanguageSettingsLoader(english)
-                it
-            }
+        val client = ButterflyClient.builder(
+            jda,
+            arrayOf("239790360728043520"),
+            useDefaultHelpCommand = false,
+            guildSettingsLoader = CustomLanguageSettingsLoader(english)
+        )
             .addCommands(ExampleCommand(), GreetCommand(), ChangeCommand())
             .addLanguages(english, hebrew, russian)
             .addPrefixes("test!")

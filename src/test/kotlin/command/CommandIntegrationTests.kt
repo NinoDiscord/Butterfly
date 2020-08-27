@@ -16,6 +16,7 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.*
+import net.dv8tion.jda.api.events.message.GenericMessageEvent
 import java.time.Duration
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
@@ -169,12 +170,13 @@ class CommandIntegrationTests : DescribeSpec({
             val meMember = mockk<Member>()
             val message = mockk<Message>(relaxed = true)
             val channel = mockk<TextChannel>()
+            val event = mockk<GenericMessageEvent>()
             every { message.channel } returns channel
             every { message.isFromGuild } returns true
             every { message.guild } returns guild
             every { guild.selfMember } returns meMember
             val client = mockk<ButterflyClient>(relaxed = true)
-            val context = spyk(CommandContext(message, command, arrayOf(), "test!", client))
+            val context = spyk(CommandContext(message, command, arrayOf(), "test!", client, event))
 
             every { context.meMember } returns meMember
             every { meMember.hasPermission(any<GuildChannel>(), Permission.MESSAGE_EMBED_LINKS) } returns false

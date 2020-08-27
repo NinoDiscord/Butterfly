@@ -18,5 +18,5 @@ interface GuildSettingsLoader<out T : GuildSettings> {
      * @param guild the guild to load the settings of
      * @return the settings
      */
-    suspend fun load(guild: Guild): T
+    suspend fun load(guild: Guild): T?
 }

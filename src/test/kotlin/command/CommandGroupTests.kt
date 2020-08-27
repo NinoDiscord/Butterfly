@@ -49,7 +49,7 @@ class CommandGroupTests : DescribeSpec({
                 }
             })
             val group = CommandGroup("test", arrayOf(cmd).asList(), "generic")
-            val ctx = mockk<CommandContext>()
+            val ctx = mockk<CommandContext>(relaxed = true)
             val message = mockk<Message>()
             val client = mockk<ButterflyClient>()
             val author = mockk<User>()
@@ -95,7 +95,7 @@ class CommandGroupTests : DescribeSpec({
                 }
             })
             val group = CommandGroup("test", arrayOf(cmd).asList(), "generic", defaultCommand = cmd)
-            val ctx = mockk<CommandContext>()
+            val ctx = mockk<CommandContext>(relaxed = true)
             val message = mockk<Message>()
             val client = mockk<ButterflyClient>()
             val author = mockk<User>()
