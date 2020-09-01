@@ -37,6 +37,7 @@ jobs:
       with:
         host: ${{ secrets.REMOTE_IP }}
         port: 22
+        debug: true
         username: ${{ secrets.REMOTE_USER }}
         password: ${{ secrets.REMOTE_PASS }}
         source: "build/dokka/html/butterfly,build/dokka/html/image,build/dokka/html/scripts,build/dokka/html/styles,build/dokka/html/-search.html,build/dokka/html/navigation.html"
