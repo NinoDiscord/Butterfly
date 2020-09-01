@@ -29,9 +29,8 @@ jobs:
       run: chmod +x gradlew
     - name: Create Documentation
       run: ./gradlew dokka
-    - run: |
-        mv build/dokka/-butterfly build/dokka/butterfly-stable
-        chmod -R +777 build/dokka
+    - name: Give Permissions
+      run: chmod -R +777 build/dokka
     - name: Push to docs server
       uses: appleboy/scp-action@master
       with:
@@ -39,10 +38,10 @@ jobs:
         port: 22
         username: ${{ secrets.REMOTE_USER }}
         password: ${{ secrets.REMOTE_PASS }}
-        source: "build/dokka/butterfly-stable,build/dokka/style.css"
-        target: "/var/www/docs.augu.dev/dist"
+        source: "build/dokka/html/*"
+        target: "/var/www/docs.augu.dev/dist/stable"
         overwrite: true
-        strip_components: 2
+        strip_components: 3
         tar_tmp_path: /tmp/kotlin-docs
 #     - name: Move from kotlin-docs to location
 #       uses: appleboy/ssh-action@master
