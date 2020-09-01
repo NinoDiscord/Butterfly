@@ -44,9 +44,11 @@ internal class SettingsCommand :
             message!!.addReaction(ONE_EMOJI).queue()
             message!!.addReaction(TWO_EMOJI).queue()
             message!!.addReaction(THREE_EMOJI).queue()
+            null
         }
         val initPrefixStep = ExecutableInteractionStep {
             ctx.reply("Type the new prefix to set. Can be up to 10 characters.")
+            null
         }
         val setsPrefixStep = ExecutableInteractionStep {
             val prefixMessage = (it as GuildMessageReceivedEvent).message
@@ -55,10 +57,12 @@ internal class SettingsCommand :
             val newPrefix = prefixMessage.contentRaw
             settings[ctx.guild!!.id] = GuildSettings(newPrefix, null)
             ctx.reply("Successfully set new prefix to ${newPrefix}!")
+            startingStep // go back to the settings info
         }
 
         val viewSettingsStep = ExecutableInteractionStep {
             ctx.reply("Current Prefix: ${ctx.settings<GuildSettings>()?.prefix ?: "test!"}")
+            startingStep
         }
 
         // ########################## Define the interactions ##########################
@@ -99,10 +103,6 @@ internal class SettingsCommand :
             }
             false
         })
-
-        setsPrefixStep.addStep(startingStep, { true })
-
-        viewSettingsStep.addStep(startingStep, { true })
 
         DefaultInteractionExecutor.executeInteractionFlow(
             startingStep,

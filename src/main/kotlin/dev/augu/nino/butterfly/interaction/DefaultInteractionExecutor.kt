@@ -10,6 +10,8 @@ import net.dv8tion.jda.api.events.GenericEvent
  *
  * It works by iteratively waiting for new events and using the events to proceed to different steps.
  * This supports [ExecutableInteractionStep]s and will execute them if present.
+ *
+ * @since 0.3
  */
 object DefaultInteractionExecutor : InteractionExecutor {
 
@@ -24,7 +26,12 @@ object DefaultInteractionExecutor : InteractionExecutor {
 
         while (interactionStep != EndInteractionStep) {
             if (!sameInteraction && interactionStep is ExecutableInteractionStep && event != null) {
-                interactionStep.execute(event)
+                val maybeNext = interactionStep.execute(event)
+
+                if (maybeNext != null) {
+                    interactionStep = maybeNext
+                    continue
+                }
             }
 
             event = eventManager.on<GenericEvent>().awaitFirst()

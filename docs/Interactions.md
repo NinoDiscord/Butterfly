@@ -13,8 +13,6 @@ One way to think about them is as a command waiting for an event to proceed to a
 ## How?
 Let's take the example of a settings command.
 
-[![Settings Command graph](https://i.augu.dev/13c0.png)]
-
 You start at the root, and print out the options a user can take.
  
 Then, the user chooses an action and is automatically forwarded to the next step, 
