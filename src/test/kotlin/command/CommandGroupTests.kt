@@ -49,7 +49,7 @@ class CommandGroupTests : DescribeSpec({
                 }
             })
             val group = CommandGroup("test", arrayOf(cmd).asList(), "generic")
-            val ctx = mockk<CommandContext>()
+            val ctx = mockk<CommandContext>(relaxed = true)
             val message = mockk<Message>()
             val client = mockk<ButterflyClient>()
             val author = mockk<User>()
@@ -72,7 +72,7 @@ class CommandGroupTests : DescribeSpec({
             every { member.hasPermission(any<GuildChannel>(), any<Collection<Permission>>()) } returns true
             every { meMember.hasPermission(any<GuildChannel>(), any<Collection<Permission>>()) } returns true
             every { ctx.command } returns group
-            every { client.selfUser } returns meUser
+            every { client.jda.selfUser } returns meUser
             every { ctx.client } returns client
             mockkStatic("dev.augu.nino.butterfly.util.MessageExtensions")
             coEvery { message.reply(any<CharSequence>()) } returns message
@@ -95,7 +95,7 @@ class CommandGroupTests : DescribeSpec({
                 }
             })
             val group = CommandGroup("test", arrayOf(cmd).asList(), "generic", defaultCommand = cmd)
-            val ctx = mockk<CommandContext>()
+            val ctx = mockk<CommandContext>(relaxed = true)
             val message = mockk<Message>()
             val client = mockk<ButterflyClient>()
             val author = mockk<User>()
@@ -115,10 +115,10 @@ class CommandGroupTests : DescribeSpec({
             every { message.channel } returns channel
             every { message.guild } returns guild
             every { guild.selfMember } returns meMember
-            every { member.hasPermission(any<GuildChannel>(), any<Collection<Permission>>()) } returns true
-            every { meMember.hasPermission(any<GuildChannel>(), any<Collection<Permission>>()) } returns true
+            every { member.hasPermission(any(), any<Collection<Permission>>()) } returns true
+            every { meMember.hasPermission(any(), any<Collection<Permission>>()) } returns true
             every { ctx.command } returns group
-            every { client.selfUser } returns meUser
+            every { client.jda.selfUser } returns meUser
             every { ctx.client } returns client
             mockkStatic("dev.augu.nino.butterfly.util.MessageExtensions")
             coEvery { message.reply(any<CharSequence>()) } returns message

@@ -9,7 +9,7 @@ import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.reactor.mono
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.*
-import net.dv8tion.jda.api.exceptions.PermissionException
+import net.dv8tion.jda.api.events.message.GenericMessageEvent
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.Duration
@@ -24,14 +24,15 @@ import java.time.Duration
  * @property args The arguments passed
  * @property prefix The command prefix
  * @property client The [ButterflyClient] instance
- * @property settings The guild settings
+ * @property event The event that called this message
  */
 class CommandContext(
     val message: Message,
     val command: Command,
     val args: Array<String>,
     val prefix: String,
-    val client: ButterflyClient
+    val client: ButterflyClient,
+    val event: GenericMessageEvent
 ) {
 
     /**
@@ -57,7 +58,7 @@ class CommandContext(
     /**
      * This bot as a [SelfUser]
      */
-    val me: SelfUser = client.selfUser
+    val me: SelfUser = client.jda.selfUser
 
     /**
      * This bot as a [Member]
@@ -166,14 +167,11 @@ class CommandContext(
      * @return a [Message] instance of the message sent
      */
     suspend fun reply(msg: MessageEmbed): Message {
-        try {
-            return message.reply(msg)
-        } catch (c: PermissionException) {
-            if (c.permission == Permission.MESSAGE_EMBED_LINKS) {
-                message.reply("This bot is missing the Message Embed Links permission.")
-            }
-            throw c // Rethrow the error
+        if (guild != null && !meMember!!.hasPermission(channel as GuildChannel, Permission.MESSAGE_EMBED_LINKS)) {
+            throw CommandException(MissingEmbedPermissionsError(message, command))
         }
+
+        return message.reply(msg)
     }
 
     /**

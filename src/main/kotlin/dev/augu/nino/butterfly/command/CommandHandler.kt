@@ -2,13 +2,15 @@ package dev.augu.nino.butterfly.command
 
 import dev.augu.nino.butterfly.ButterflyClient
 import dev.augu.nino.butterfly.GuildSettings
+import dev.augu.nino.butterfly.IButterflyClient
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.Message
+import net.dv8tion.jda.api.events.message.GenericMessageEvent
 
 /**
  * The command handler.
  *
- * This class is built in the [ButterflyClient].
+ * This class is built in the [IButterflyClient].
  */
 class CommandHandler(private val client: ButterflyClient) {
 
@@ -19,7 +21,7 @@ class CommandHandler(private val client: ButterflyClient) {
          * @since 0.2.0
          * @param message the message sent
          * @param command the command to run
-         * @param client the [ButterflyClient] instance
+         * @param client The [ButterflyClient] instance
          */
         fun verify(message: Message, command: Command, client: ButterflyClient) {
 
@@ -67,16 +69,16 @@ class CommandHandler(private val client: ButterflyClient) {
      * This method is called on any message received.
      *
      * @param message the message received
+     * @param event the event that caused the invoke
      */
-    suspend fun invoke(message: Message) {
+    suspend fun invoke(message: Message, event: GenericMessageEvent) {
         if (message.author.isBot) return
 
         var content = message.contentRaw
-        val settings: GuildSettings?
-        if (message.isFromGuild) {
-            settings = client.guildSettingsLoader.load(message.guild)
+        val settings: GuildSettings? = if (message.isFromGuild) {
+            client.guildSettingsLoader.load(message.guild)
         } else {
-            settings = null
+            null
         }
 
         val prefixes =
@@ -94,7 +96,14 @@ class CommandHandler(private val client: ButterflyClient) {
         verify(message, command, client)
 
         val ctx =
-            CommandContext(message, command, content.split(" ").filterNot { it == "" }.toTypedArray(), prefix, client)
+            CommandContext(
+                message,
+                command,
+                content.split(" ").filterNot { it == "" }.toTypedArray(),
+                prefix,
+                client,
+                event
+            )
 
         command.execute(ctx)
     }
