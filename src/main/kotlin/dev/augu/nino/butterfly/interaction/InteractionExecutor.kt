@@ -8,6 +8,8 @@ import net.dv8tion.jda.api.events.GenericEvent
  * Interactions should be executed like a decision tree but in a graph, meaning that there can be circles.
  *
  * More Information can be found in the [DefaultInteractionExecutor]'s documentation.
+ *
+ * @since 0.3
  */
 interface InteractionExecutor {
 
