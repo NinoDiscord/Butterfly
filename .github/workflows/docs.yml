@@ -39,7 +39,7 @@ jobs:
         port: 22
         username: ${{ secrets.REMOTE_USER }}
         password: ${{ secrets.REMOTE_PASS }}
-        source: "build/dokka/html/*"
+        source: "build/dokka/html"
         target: "/var/www/docs.augu.dev/dist"
         overwrite: true
         strip_components: 2
