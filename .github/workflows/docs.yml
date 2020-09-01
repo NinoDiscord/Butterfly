@@ -40,10 +40,10 @@ jobs:
         debug: true
         username: ${{ secrets.REMOTE_USER }}
         password: ${{ secrets.REMOTE_PASS }}
-        source: "build/dokka/html/butterfly,build/dokka/html/image,build/dokka/html/scripts,build/dokka/html/styles,build/dokka/html/-search.html,build/dokka/html/navigation.html"
+        source: "build/dokka/html/*"
         target: "/var/www/docs.augu.dev/dist"
         overwrite: true
-        strip_components: 2
+        strip_components: 3
         tar_tmp_path: /tmp/kotlin-docs
 #     - name: Move from kotlin-docs to location
 #       uses: appleboy/ssh-action@master
