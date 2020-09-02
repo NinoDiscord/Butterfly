@@ -32,7 +32,7 @@ dependencies {
     api("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.3.7")
 
     // JDA
-    api("net.dv8tion:JDA:4.1.1_165") {
+    api("net.dv8tion:JDA:4.2.0_200") {
         exclude(module = "opus-java")
     }
     api("club.minnced:jda-reactor:1.2.0")
