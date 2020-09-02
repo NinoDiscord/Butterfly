@@ -46,7 +46,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.7")
 
     // Logging
-    api("org.slf4j:slf4j-api:1.6.1")
+    api("org.slf4j:slf4j-api:1.7.30")
     testImplementation("org.slf4j:slf4j-simple:1.7.30")
 }
 
