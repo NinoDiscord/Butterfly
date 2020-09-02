@@ -47,7 +47,7 @@ dependencies {
 
     // Logging
     api("org.slf4j:slf4j-api:1.6.1")
-    testImplementation("org.slf4j:slf4j-simple:1.6.1")
+    testImplementation("org.slf4j:slf4j-simple:1.7.30")
 }
 
 configure<JavaPluginConvention> {
