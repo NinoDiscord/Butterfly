@@ -43,7 +43,7 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core-jvm:4.2.3")
     testImplementation("io.kotest:kotest-property-jvm:4.1.0.RC2")
     testImplementation("io.mockk:mockk:1.10.0")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.7")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.9")
 
     // Logging
     api("org.slf4j:slf4j-api:1.7.30")
