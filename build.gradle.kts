@@ -35,7 +35,7 @@ dependencies {
     api("net.dv8tion:JDA:4.1.1_165") {
         exclude(module = "opus-java")
     }
-    api("club.minnced:jda-reactor:1.1.0")
+    api("club.minnced:jda-reactor:1.2.0")
 
     // Testing tools
     testImplementation("junit:junit:4.12")
