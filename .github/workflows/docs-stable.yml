@@ -28,7 +28,7 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Create Documentation
-      run: ./gradlew dokka
+      run: ./gradlew dokkaHtml
     - name: Give Permissions
       run: chmod -R +777 build/dokka
     - name: Push to docs server
