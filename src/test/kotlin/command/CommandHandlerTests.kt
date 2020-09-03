@@ -20,13 +20,14 @@ import kotlinx.coroutines.runBlocking
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.*
+import net.dv8tion.jda.api.events.message.GenericMessageEvent
 
 @ExperimentalCoroutinesApi
 @ObsoleteCoroutinesApi
 class CommandHandlerTests : DescribeSpec({
     val jda = mockk<JDA>(relaxed = true)
     every { jda.eventManager } returns ReactiveEventManager()
-    val client = spyk(ButterflyClient(jda, arrayOf("239790360728043520")))
+    val client = spyk(ButterflyClient(jda, arrayOf("239790360728043520"), useDefaultHelpCommand = false))
     val handler = CommandHandler(client)
     val message = mockk<Message>(relaxed = true)
     val command = spyk<Command>(object : Command(
@@ -51,6 +52,7 @@ class CommandHandlerTests : DescribeSpec({
     describe("Command Handler invoke tests") {
         it("should not run a guild-only command on a private channel") {
             val privChannel = mockk<PrivateChannel>(relaxed = true)
+            val event = mockk<GenericMessageEvent>()
 
 
             every { message.channel } returns privChannel
@@ -59,7 +61,7 @@ class CommandHandlerTests : DescribeSpec({
 
             shouldThrowMessage("Guild-only command invoked in non-guild environment.") {
                 runBlocking {
-                    handler.invoke(message)
+                    handler.invoke(message, event)
                 }
             }
         }
@@ -68,6 +70,7 @@ class CommandHandlerTests : DescribeSpec({
             val guild = mockk<Guild>(relaxed = true)
             val guildChannel = mockk<TextChannel>(relaxed = true)
             val member = mockk<Member>(relaxed = true)
+            val event = mockk<GenericMessageEvent>()
 
             every { message.author.isBot } returns true
             every { message.isFromGuild } returns true
@@ -80,7 +83,7 @@ class CommandHandlerTests : DescribeSpec({
 
             shouldNotThrow<Exception> {
                 runBlocking {
-                    handler.invoke(message)
+                    handler.invoke(message, event)
                 }
             }
 
@@ -95,6 +98,7 @@ class CommandHandlerTests : DescribeSpec({
             val guild = mockk<Guild>(relaxed = true)
             val guildChannel = mockk<TextChannel>(relaxed = true)
             val member = mockk<Member>(relaxed = true)
+            val event = mockk<GenericMessageEvent>()
 
             every { message.author.id } returns "0"
             every { message.author.isBot } returns false
@@ -109,7 +113,7 @@ class CommandHandlerTests : DescribeSpec({
 
             shouldThrowMessage("Owner-only command invoked not by the owner.") {
                 runBlocking {
-                    handler.invoke(message)
+                    handler.invoke(message, event)
                 }
             }
 
@@ -123,6 +127,7 @@ class CommandHandlerTests : DescribeSpec({
             val guildChannel = mockk<TextChannel>(relaxed = true)
             val member = mockk<Member>(relaxed = true)
             val sampleMsg = mockk<Message>(relaxed = true)
+            val event = mockk<GenericMessageEvent>()
 
             every { message.author.id } returns "239790360728043520"
             every { message.author.isBot } returns false
@@ -141,7 +146,7 @@ class CommandHandlerTests : DescribeSpec({
 
             shouldNotThrow<Exception> {
                 runBlocking {
-                    handler.invoke(message)
+                    handler.invoke(message, event)
                 }
             }
 
@@ -154,6 +159,7 @@ class CommandHandlerTests : DescribeSpec({
             val guild = mockk<Guild>(relaxed = true)
             val guildChannel = mockk<TextChannel>(relaxed = true)
             val member = mockk<Member>(relaxed = true)
+            val event = mockk<GenericMessageEvent>()
 
             every { message.isFromGuild } returns true
             every { message.guild } returns guild
@@ -168,7 +174,7 @@ class CommandHandlerTests : DescribeSpec({
 
             shouldThrowMessage("User has insufficient permissions.") {
                 runBlocking {
-                    handler.invoke(message)
+                    handler.invoke(message, event)
                 }
             }
         }
@@ -178,6 +184,7 @@ class CommandHandlerTests : DescribeSpec({
             val guildChannel = mockk<TextChannel>(relaxed = true)
             val member = mockk<Member>(relaxed = true)
             val me = mockk<Member>(relaxed = true)
+            val event = mockk<GenericMessageEvent>()
 
             every { message.isFromGuild } returns true
             every { message.textChannel } returns guildChannel
@@ -194,7 +201,7 @@ class CommandHandlerTests : DescribeSpec({
             message.guild.selfMember.hasPermission(guildChannel, Permission.getPermissions(1)).shouldBe(false)
             shouldThrowMessage("Bot has insufficient permissions.") {
                 runBlocking {
-                    handler.invoke(message)
+                    handler.invoke(message, event)
                 }
             }
         }
@@ -208,6 +215,7 @@ class CommandHandlerTests : DescribeSpec({
             val customSettingsLoader = object : GuildSettingsLoader<GuildSettings> {
                 override suspend fun load(guild: Guild): GuildSettings = GuildSettings("z!", null)
             }
+            val event = mockk<GenericMessageEvent>()
 
             every { client.guildSettingsLoader } returns customSettingsLoader
             every { message.isFromGuild } returns true
@@ -228,7 +236,7 @@ class CommandHandlerTests : DescribeSpec({
 
             shouldNotThrow<CommandException> {
                 runBlocking {
-                    handler.invoke(message)
+                    handler.invoke(message, event)
                 }
             }
 
@@ -243,6 +251,7 @@ class CommandHandlerTests : DescribeSpec({
             val member = mockk<Member>(relaxed = true)
             val me = mockk<Member>(relaxed = true)
             val sampleMsg = mockk<Message>(relaxed = true)
+            val event = mockk<GenericMessageEvent>()
 
             every { message.isFromGuild } returns true
             every { message.channel } returns guildChannel
@@ -262,7 +271,7 @@ class CommandHandlerTests : DescribeSpec({
 
             shouldNotThrow<CommandException> {
                 runBlocking {
-                    handler.invoke(message)
+                    handler.invoke(message, event)
                 }
             }
 
@@ -277,6 +286,7 @@ class CommandHandlerTests : DescribeSpec({
             val member = mockk<Member>(relaxed = true)
             val me = mockk<Member>(relaxed = true)
             val sampleMsg = mockk<Message>(relaxed = true)
+            val event = mockk<GenericMessageEvent>()
 
             every { message.isFromGuild } returns true
             every { message.channel } returns guildChannel
@@ -296,7 +306,7 @@ class CommandHandlerTests : DescribeSpec({
 
             shouldNotThrow<CommandException> {
                 runBlocking {
-                    handler.invoke(message)
+                    handler.invoke(message, event)
                 }
             }
 

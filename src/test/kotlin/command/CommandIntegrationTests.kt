@@ -1,10 +1,12 @@
 package command
 
+import dev.augu.nino.butterfly.ButterflyClient
 import dev.augu.nino.butterfly.command.Command
 import dev.augu.nino.butterfly.command.CommandContext
 import dev.augu.nino.butterfly.command.DefaultHelpCommand
 import dev.augu.nino.butterfly.util.edit
 import io.kotest.assertions.throwables.shouldNotThrow
+import io.kotest.assertions.throwables.shouldThrowMessage
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.booleans.shouldBeTrue
 import io.kotest.matchers.collections.shouldHaveSize
@@ -12,8 +14,9 @@ import io.kotest.matchers.shouldBe
 import io.mockk.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
-import net.dv8tion.jda.api.entities.Message
-import net.dv8tion.jda.api.entities.MessageEmbed
+import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.entities.*
+import net.dv8tion.jda.api.events.message.GenericMessageEvent
 import java.time.Duration
 import java.time.OffsetDateTime
 import java.time.temporal.ChronoUnit
@@ -25,7 +28,7 @@ class CommandIntegrationTests : DescribeSpec({
             override suspend fun execute(ctx: CommandContext) {
                 val msg = ctx.reply("Calculating...")
                 val ping = ctx.message.timeCreated.until(msg.timeCreated, ChronoUnit.MILLIS)
-                msg.edit("Ping: ${ping}ms | Websocket: ${ctx.client.gatewayPing}ms")
+                msg.edit("Ping: ${ping}ms | Websocket: ${ctx.client.jda.gatewayPing}ms")
             }
         }
 
@@ -47,7 +50,7 @@ class CommandIntegrationTests : DescribeSpec({
             val msg = mockk<Message>(relaxed = true)
             val time = OffsetDateTime.now()
 
-            every { ctx.client.gatewayPing } returns 5
+            every { ctx.client.jda.gatewayPing } returns 5
             every { ctx.message.timeCreated } returns time
             coEvery { ctx.language() } returns null
             every { msg.timeCreated } returns time + Duration.of(5, ChronoUnit.SECONDS)
@@ -88,7 +91,7 @@ class CommandIntegrationTests : DescribeSpec({
             every { ctx.client.commands } returns commands
             every { ctx.args } returns arrayOf()
             coEvery { ctx.language() } returns null
-            every { ctx.client.selfUser.name } returns "Test"
+            every { ctx.client.jda.selfUser.name } returns "Test"
 
             shouldNotThrow<Exception> {
                 runBlocking {
@@ -117,7 +120,7 @@ class CommandIntegrationTests : DescribeSpec({
             every { ctx.client.commands } returns commands
             every { ctx.args } returns arrayOf("visible")
             coEvery { ctx.language() } returns null
-            every { ctx.client.selfUser.name } returns "Test"
+            every { ctx.client.jda.selfUser.name } returns "Test"
 
             shouldNotThrow<Exception> {
                 runBlocking {
@@ -147,7 +150,7 @@ class CommandIntegrationTests : DescribeSpec({
             every { ctx.client.aliases } returns mutableMapOf()
             every { ctx.args } returns arrayOf("errorous")
             coEvery { ctx.language() } returns null
-            every { ctx.client.selfUser.name } returns "Test"
+            every { ctx.client.jda.selfUser.name } returns "Test"
 
             shouldNotThrow<Exception> {
                 runBlocking {
@@ -157,6 +160,32 @@ class CommandIntegrationTests : DescribeSpec({
 
             coVerify(exactly = 1) {
                 ctx.reply("Command not found.")
+            }
+
+        }
+
+
+        it("Missing embed permissions should throw an exception") {
+            val guild = mockk<Guild>()
+            val meMember = mockk<Member>()
+            val message = mockk<Message>(relaxed = true)
+            val channel = mockk<TextChannel>()
+            val event = mockk<GenericMessageEvent>()
+            every { message.channel } returns channel
+            every { message.isFromGuild } returns true
+            every { message.guild } returns guild
+            every { guild.selfMember } returns meMember
+            val client = mockk<ButterflyClient>(relaxed = true)
+            val context = spyk(CommandContext(message, command, arrayOf(), "test!", client, event))
+
+            every { context.meMember } returns meMember
+            every { meMember.hasPermission(any<GuildChannel>(), Permission.MESSAGE_EMBED_LINKS) } returns false
+            coEvery { context.language() } returns null
+
+            shouldThrowMessage("Missing permissions to embed message.") {
+                runBlocking {
+                    command.execute(context)
+                }
             }
 
         }

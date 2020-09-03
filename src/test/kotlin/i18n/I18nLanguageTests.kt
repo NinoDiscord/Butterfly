@@ -23,6 +23,7 @@ class I18nLanguageTests : DescribeSpec({
 
     describe("I18n Language Tests") {
         val theBLanguage = I18nLanguage(
+            "b",
             mapOf(
                 "simple" to "bsbibmbpblbe",
                 "two words" to "btbwbo bwbobrbdbs",
