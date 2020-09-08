@@ -8,7 +8,7 @@ import java.util.*
 plugins {
     java
     kotlin("jvm") version "1.4.0"
-    id("org.jetbrains.dokka") version "1.4.0-rc-24"
+    id("org.jetbrains.dokka") version "1.4.0"
     id("com.jfrog.bintray") version "1.8.5"
     `maven-publish`
     id("com.github.johnrengelman.shadow") version "6.0.0"
@@ -16,7 +16,7 @@ plugins {
 
 val artifact = "Butterfly"
 group = "dev.augu.nino"
-version = "0.3.1"
+version = "0.3.2"
 
 
 repositories {
@@ -27,7 +27,7 @@ repositories {
 
 dependencies {
     // Kotlin
-    implementation(kotlin("stdlib-jdk8"))
+    implementation(kotlin("stdlib"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.3.9")
 
@@ -81,20 +81,16 @@ tasks {
 
         dokkaSourceSets {
             val commonMain by creating {
-                displayName = "Butterfly"
-                includes = file("docs").listFiles()!!.map { it.canonicalPath }
-                samples = file("src/examples/kotlin/dev/augu/nino/butterfly/examples").listFiles()!!
-                    .map { it.canonicalPath }
-                sourceRoot {
-                    path = kotlin.sourceSets.getByName("main").kotlin.srcDirs.first().toString()
+                displayName.set("Butterfly")
+                includes.from(file("docs").listFiles())
+                samples.from(file("src/examples/kotlin/dev/augu/nino/butterfly/examples").listFiles())
+                externalDocumentationLink {
+                    url.set(URL("https://ci.dv8tion.net/job/JDA/javadoc/index.html"))
+                    packageListUrl.set(URL("https://ci.dv8tion.net/job/JDA/javadoc/element-list"))
                 }
                 externalDocumentationLink {
-                    url = URL("https://ci.dv8tion.net/job/JDA/javadoc/index.html")
-                    packageListUrl = URL("https://ci.dv8tion.net/job/JDA/javadoc/element-list")
-                }
-                externalDocumentationLink {
-                    url = URL("https://projectreactor.io/docs/core/release/api/")
-                    packageListUrl = URL("https://projectreactor.io/docs/core/release/api/package-list")
+                    url.set(URL("https://projectreactor.io/docs/core/release/api/"))
+                    packageListUrl.set(URL("https://projectreactor.io/docs/core/release/api/package-list"))
                 }
 
             }
