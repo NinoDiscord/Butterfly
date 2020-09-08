@@ -7,7 +7,7 @@ import java.util.*
 
 plugins {
     java
-    kotlin("jvm") version "1.3.72"
+    kotlin("jvm") version "1.4.0"
     id("org.jetbrains.dokka") version "1.4.0-rc-24"
     id("com.jfrog.bintray") version "1.8.5"
     `maven-publish`
@@ -16,7 +16,7 @@ plugins {
 
 val artifact = "Butterfly"
 group = "dev.augu.nino"
-version = "0.3.0"
+version = "0.3.1"
 
 
 repositories {
@@ -32,7 +32,7 @@ dependencies {
     api("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.3.9")
 
     // JDA
-    api("net.dv8tion:JDA:4.2.0_200") {
+    api("net.dv8tion:JDA:4.2.0_204") {
         exclude(module = "opus-java")
     }
     api("club.minnced:jda-reactor:1.2.0")
