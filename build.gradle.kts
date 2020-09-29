@@ -16,7 +16,7 @@ plugins {
 
 val artifact = "Butterfly"
 group = "dev.augu.nino"
-version = "0.3.2"
+version = "0.3.3"
 
 
 repositories {
@@ -51,8 +51,8 @@ dependencies {
 }
 
 configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 sourceSets {
@@ -70,11 +70,11 @@ configurations["examplesRuntimeOnly"].extendsFrom(configurations.runtimeOnly.get
 
 tasks {
     compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "11"
     }
 
     compileTestKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "11"
     }
 
     dokkaHtml {
@@ -99,7 +99,7 @@ tasks {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
 }
 
 tasks.withType<Test> {
