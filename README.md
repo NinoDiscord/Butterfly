@@ -3,9 +3,9 @@
 
 ## How to use
 ### Documentation
-Master: [https://docs.augu.dev/-butterfly](https://docs.augu.dev/-butterfly)
+Master: [https://docs.augu.dev/-butterfly](https://butterfly.augu.dev)
 
-Stable: [https://docs.augu.dev/stable/-butterfly](https://docs.augu.dev/stable/-butterfly)
+Stable: [https://docs.augu.dev/stable/-butterfly](https://butterfly.augu.dev/stable)
 ### Adding as dependency:
 Fetch the version from the badge.
 #### Add dependency using Gradle

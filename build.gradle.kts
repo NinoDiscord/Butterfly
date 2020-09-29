@@ -7,8 +7,8 @@ import java.util.*
 
 plugins {
     java
-    kotlin("jvm") version "1.4.0"
-    id("org.jetbrains.dokka") version "1.4.0"
+    kotlin("jvm") version "1.4.10"
+    id("org.jetbrains.dokka") version "1.4.10"
     id("com.jfrog.bintray") version "1.8.5"
     `maven-publish`
     id("com.github.johnrengelman.shadow") version "6.0.0"
@@ -16,7 +16,7 @@ plugins {
 
 val artifact = "Butterfly"
 group = "dev.augu.nino"
-version = "0.3.2"
+version = "0.3.3"
 
 
 repositories {
@@ -32,17 +32,17 @@ dependencies {
     api("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.3.9")
 
     // JDA
-    api("net.dv8tion:JDA:4.2.0_204") {
+    api("net.dv8tion:JDA:4.2.0_207") {
         exclude(module = "opus-java")
     }
     api("club.minnced:jda-reactor:1.2.0")
 
     // Testing tools
     testImplementation("junit:junit:4.13")
-    testImplementation("io.kotest:kotest-runner-junit5-jvm:4.2.3")
-    testImplementation("io.kotest:kotest-assertions-core-jvm:4.2.3")
-    testImplementation("io.kotest:kotest-property-jvm:4.2.3")
-    testImplementation("io.mockk:mockk:1.10.0")
+    testImplementation("io.kotest:kotest-runner-junit5-jvm:4.2.5")
+    testImplementation("io.kotest:kotest-assertions-core-jvm:4.2.5")
+    testImplementation("io.kotest:kotest-property-jvm:4.2.5")
+    testImplementation("io.mockk:mockk:1.10.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.9")
 
     // Logging
@@ -51,8 +51,8 @@ dependencies {
 }
 
 configure<JavaPluginConvention> {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 sourceSets {
@@ -70,11 +70,11 @@ configurations["examplesRuntimeOnly"].extendsFrom(configurations.runtimeOnly.get
 
 tasks {
     compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "11"
     }
 
     compileTestKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "11"
     }
 
     dokkaHtml {
@@ -99,7 +99,7 @@ tasks {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = JavaVersion.VERSION_1_8.toString()
+    kotlinOptions.jvmTarget = JavaVersion.VERSION_11.toString()
 }
 
 tasks.withType<Test> {
