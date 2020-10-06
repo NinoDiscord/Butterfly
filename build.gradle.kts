@@ -11,7 +11,7 @@ plugins {
     id("org.jetbrains.dokka") version "1.4.10"
     id("com.jfrog.bintray") version "1.8.5"
     `maven-publish`
-    id("com.github.johnrengelman.shadow") version "6.0.0"
+    id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
 val artifact = "Butterfly"
