@@ -1,5 +1,3 @@
-# This is a workflow that initializes PRs to the master branch
-
 name: CI
 
 on:
