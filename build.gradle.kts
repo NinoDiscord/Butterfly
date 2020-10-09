@@ -11,7 +11,7 @@ plugins {
     id("org.jetbrains.dokka") version "1.4.10"
     id("com.jfrog.bintray") version "1.8.5"
     `maven-publish`
-    id("com.github.johnrengelman.shadow") version "6.0.0"
+    id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
 val artifact = "Butterfly"
@@ -32,16 +32,16 @@ dependencies {
     api("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.3.9")
 
     // JDA
-    api("net.dv8tion:JDA:4.2.0_207") {
+    api("net.dv8tion:JDA:4.2.0_208") {
         exclude(module = "opus-java")
     }
     api("club.minnced:jda-reactor:1.2.0")
 
     // Testing tools
     testImplementation("junit:junit:4.13")
-    testImplementation("io.kotest:kotest-runner-junit5-jvm:4.2.5")
-    testImplementation("io.kotest:kotest-assertions-core-jvm:4.2.5")
-    testImplementation("io.kotest:kotest-property-jvm:4.2.5")
+    testImplementation("io.kotest:kotest-runner-junit5-jvm:4.2.6")
+    testImplementation("io.kotest:kotest-assertions-core-jvm:4.2.6")
+    testImplementation("io.kotest:kotest-property-jvm:4.2.6")
     testImplementation("io.mockk:mockk:1.10.2")
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.9")
 
