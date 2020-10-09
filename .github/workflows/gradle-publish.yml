@@ -18,9 +18,9 @@ jobs:
         server-id: github
         settings-path: ${{ github.workspace }}
     - name: Build with Gradle
-      run: gradlew build
+      run: ./gradlew build
     - name: Publish to Bintray
-      run: gradlew bintrayUpload
+      run: ./gradlew bintrayUpload
       env:
         BINTRAY_USER: ${{ secrets.BINTRAY_USER }}
         BINTRAY_KEY: ${{ secrets.BINTRAY_KEY }}
