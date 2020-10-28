@@ -28,7 +28,7 @@ repositories {
 dependencies {
     // Kotlin
     implementation(kotlin("stdlib"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.0")
     api("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.3.9")
 
     // JDA
