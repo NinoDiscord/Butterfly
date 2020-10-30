@@ -111,6 +111,7 @@ val shadowJar: ShadowJar by tasks
 shadowJar.apply {
     archiveBaseName.set(artifact)
     archiveClassifier.set(null as String?)
+    exclude("**/*.kotlin_metadata", "**/*.kotlin_module", "**/*.kotlin_builtins")
 }
 
 val sourcesJar = task<Jar>("sourcesJar") {
