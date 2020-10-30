@@ -29,21 +29,21 @@ dependencies {
     // Kotlin
     implementation(kotlin("stdlib"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.0")
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.3.9")
-
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.4.0")
+  
     // JDA
-    api("net.dv8tion:JDA:4.2.0_209") {
+    api("net.dv8tion:JDA:4.2.0_214") {
         exclude(module = "opus-java")
     }
     api("club.minnced:jda-reactor:1.2.0")
 
     // Testing tools
     testImplementation("junit:junit:4.13.1")
-    testImplementation("io.kotest:kotest-runner-junit5-jvm:4.2.6")
+    testImplementation("io.kotest:kotest-runner-junit5-jvm:4.3.0")
     testImplementation("io.kotest:kotest-assertions-core-jvm:4.3.0")
     testImplementation("io.kotest:kotest-property-jvm:4.3.0")
     testImplementation("io.mockk:mockk:1.10.2")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.9")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.0")
 
     // Logging
     api("org.slf4j:slf4j-api:1.7.30")
@@ -111,6 +111,7 @@ val shadowJar: ShadowJar by tasks
 shadowJar.apply {
     archiveBaseName.set(artifact)
     archiveClassifier.set(null as String?)
+    exclude("**/*.kotlin_metadata", "**/*.kotlin_module", "**/*.kotlin_builtins")
 }
 
 val sourcesJar = task<Jar>("sourcesJar") {
