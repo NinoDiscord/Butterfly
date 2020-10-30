@@ -8,7 +8,7 @@ import java.util.*
 plugins {
     java
     kotlin("jvm") version "1.4.10"
-    id("org.jetbrains.dokka") version "1.4.10"
+    id("org.jetbrains.dokka") version "1.4.10.2"
     id("com.jfrog.bintray") version "1.8.5"
     `maven-publish`
     id("com.github.johnrengelman.shadow") version "6.1.0"
@@ -16,7 +16,7 @@ plugins {
 
 val artifact = "Butterfly"
 group = "dev.augu.nino"
-version = "0.3.3"
+version = "0.3.4"
 
 
 repositories {
@@ -28,22 +28,22 @@ repositories {
 dependencies {
     // Kotlin
     implementation(kotlin("stdlib"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.3.9")
-
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.0")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.4.0")
+  
     // JDA
-    api("net.dv8tion:JDA:4.2.0_208") {
+    api("net.dv8tion:JDA:4.2.0_214") {
         exclude(module = "opus-java")
     }
     api("club.minnced:jda-reactor:1.2.0")
 
     // Testing tools
-    testImplementation("junit:junit:4.13")
-    testImplementation("io.kotest:kotest-runner-junit5-jvm:4.2.6")
-    testImplementation("io.kotest:kotest-assertions-core-jvm:4.2.6")
-    testImplementation("io.kotest:kotest-property-jvm:4.2.6")
+    testImplementation("junit:junit:4.13.1")
+    testImplementation("io.kotest:kotest-runner-junit5-jvm:4.3.0")
+    testImplementation("io.kotest:kotest-assertions-core-jvm:4.3.0")
+    testImplementation("io.kotest:kotest-property-jvm:4.3.0")
     testImplementation("io.mockk:mockk:1.10.2")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.3.9")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.0")
 
     // Logging
     api("org.slf4j:slf4j-api:1.7.30")
@@ -111,6 +111,7 @@ val shadowJar: ShadowJar by tasks
 shadowJar.apply {
     archiveBaseName.set(artifact)
     archiveClassifier.set(null as String?)
+    exclude("**/*.kotlin_metadata", "**/*.kotlin_module", "**/*.kotlin_builtins")
 }
 
 val sourcesJar = task<Jar>("sourcesJar") {
