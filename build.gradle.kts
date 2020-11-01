@@ -1,4 +1,3 @@
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.jfrog.bintray.gradle.BintrayExtension
 import com.jfrog.bintray.gradle.tasks.BintrayUploadTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -11,12 +10,11 @@ plugins {
     id("org.jetbrains.dokka") version "1.4.10.2"
     id("com.jfrog.bintray") version "1.8.5"
     `maven-publish`
-    id("com.github.johnrengelman.shadow") version "6.1.0"
 }
 
 val artifact = "Butterfly"
 group = "dev.augu.nino"
-version = "0.3.4"
+version = "0.3.5"
 
 
 repositories {
@@ -104,14 +102,6 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-val shadowJar: ShadowJar by tasks
-
-shadowJar.apply {
-    archiveBaseName.set(artifact)
-    archiveClassifier.set(null as String?)
-    exclude("**/*.kotlin_metadata", "**/*.kotlin_module", "**/*.kotlin_builtins")
 }
 
 val sourcesJar = task<Jar>("sourcesJar") {
