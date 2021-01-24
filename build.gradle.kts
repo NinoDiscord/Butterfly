@@ -7,7 +7,7 @@ import java.util.*
 plugins {
     java
     kotlin("jvm") version "1.4.10"
-    id("org.jetbrains.dokka") version "1.4.10.2"
+    id("org.jetbrains.dokka") version "1.4.20"
     id("com.jfrog.bintray") version "1.8.5"
     `maven-publish`
 }
